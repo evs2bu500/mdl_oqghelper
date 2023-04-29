@@ -3,6 +3,7 @@ package com.pabu5h.evs2.oqghelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 //import lombok.Setter;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -32,6 +33,11 @@ public class OqgHelper {
 //    OqgHelper(RestTemplate template){
 //        restTemplate = template;
 //    }
+    private final Logger logger;
+
+    OqgHelper(Logger logger) {
+        this.logger = logger;
+    }
 
     public List<Map<String, Object>> OqgR(String sqlQuery) throws Exception {
         String rUrl = oqgPath + oqgEptR;
