@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.pabu5h.evs2</groupId>
 	<artifactId>oqghelper</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>tablehelper</name>
-	<description>Table Helper</description>
+	<version>1.0.0</version>
+	<name>OqgHelper</name>
+	<description>OqgHelper</description>
 	<properties>
 		<java.version>20</java.version>
 	</properties>
