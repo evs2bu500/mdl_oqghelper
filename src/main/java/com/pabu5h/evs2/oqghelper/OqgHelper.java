@@ -35,7 +35,7 @@ public class OqgHelper {
 //    }
     private final Logger logger;
 
-    OqgHelper(Logger logger) {
+    public OqgHelper(Logger logger) {
         this.logger = logger;
     }
 
