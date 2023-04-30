@@ -23,7 +23,7 @@ public class QueryHelper {
     public QueryHelper(Logger logger) {
         this.logger = logger;
     }
-    public List<Map<String, Object>> getNewerMeterSnsFromTariffTable(){
+    public List<String> getNewerMeterSnsFromTariffTable(){
 
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return meterSns;
+        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
 
     public String getMerterSnFromMeterDisplayname(String meterDisplayname) {
