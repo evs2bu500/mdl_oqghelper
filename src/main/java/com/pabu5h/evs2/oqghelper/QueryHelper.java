@@ -19,8 +19,8 @@ public class QueryHelper {
 
     private final Logger logger;
 
-    QueryHelper(Class<?> ApplicationClass) {
-        this.logger = LogManager.getLogger(ApplicationClass);
+    public QueryHelper(Logger logger) {
+        this.logger = logger;
     }
 
     public String getMerterSnFromMeterDisplayname(String meterDisplayname) {
