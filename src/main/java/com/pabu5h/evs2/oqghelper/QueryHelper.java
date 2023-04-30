@@ -29,11 +29,11 @@ public class QueryHelper {
         try {
             meterSn = oqgHelper.OqgR(sqlMeterSn);
         } catch (Exception e) {
-//            logger.error("Error getting meter_sn for meterDisplayname: " + meterDisplayname);
+            logger.error("Error getting meter_sn for meterDisplayname: " + meterDisplayname);
             throw new RuntimeException(e);
         }
         if (meterSn.isEmpty()) {
-//            logger.info("meter_sn is empty for meterDisplayname: " + meterDisplayname);
+            logger.info("meter_sn is empty for meterDisplayname: " + meterDisplayname);
             return "";
         }
         return (meterSn.get(0).get("meter_sn") == null ? "" : meterSn.get(0).get("meter_sn").toString());

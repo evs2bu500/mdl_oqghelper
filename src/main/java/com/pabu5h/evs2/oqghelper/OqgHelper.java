@@ -55,7 +55,9 @@ public class OqgHelper {
 
             if(response.getStatusCode() == HttpStatus.OK) {
                 if (response.getBody() == null){
-                    throw new Exception("OQG Query Error: Response body is null");
+                    String msg = "OQG Query Error: Response body is null";
+                    logger.info(msg);
+                    throw new Exception(msg);
                 }
                 if(response.getBody().equals("[]")){
                     return List.of();
@@ -64,10 +66,14 @@ public class OqgHelper {
                 ObjectMapper objectMapper = new ObjectMapper();
                 return objectMapper.readValue(response.getBody(), new TypeReference<List<Map<String, Object>>>(){});
             }else{
-                throw new Exception("OQG Query Error: " + response.getStatusCode());
+                String msg = "OQG Query Error: " + response.getStatusCode();
+                logger.info(msg);
+                throw new Exception(msg);
             }
         } catch (Exception e){
-            throw new Exception("OQG Query Error: " + e.getMessage());
+            String msg = "OQG Query Error: " + e.getMessage();
+            logger.info(msg);
+            throw new Exception(msg);
         }
     }
 
@@ -87,13 +93,17 @@ public class OqgHelper {
 
             String responseBody = response.getBody();
             if(responseBody == null){
-                throw new Exception("OQG IU Error: Response body is null");
+                String msg = "OQG IU Error: Response body is null";
+                logger.info(msg);
+                throw new Exception(msg);
             }
             int numRowsAffected = Integer.parseInt(responseBody);
             return Map.of("resp", numRowsAffected);
 
         } catch (Exception e){
-            throw new Exception("OQG IU Error: " + e.getMessage());
+            String msg = "OQG IU Error: " + e.getMessage();
+            logger.info(msg);
+            throw new Exception(msg);
         }
     }
 
@@ -113,13 +123,17 @@ public class OqgHelper {
 
             String responseBody = response.getBody();
             if(responseBody == null){
-                throw new Exception("OQG IU Error: Response body is null");
+                String msg = "OQG D Error: Response body is null";
+                logger.info(msg);
+                throw new Exception(msg);
             }
             int numRowsAffected = Integer.parseInt(responseBody);
             return Map.of("resp", numRowsAffected);
 
         } catch (Exception e){
-            throw new Exception("OQG IU Error: " + e.getMessage());
+            String msg = "OQG D Error: " + e.getMessage();
+            logger.info(msg);
+            throw new Exception(msg);
         }
     }
 }
