@@ -25,7 +25,7 @@ public class QueryHelper {
     }
 
     public String getMerterSnFromMeterDisplayname(String meterDisplayname) {
-        String sqlMeterSn = "select meter_sn from meter where display_name = '" + meterDisplayname + "'";
+        String sqlMeterSn = "select meter_sn from meter where meter_displayname = '" + meterDisplayname + "'";
         List<Map<String, Object>> meterSn = new ArrayList<>();
         try {
             meterSn = oqgHelper.OqgR(sqlMeterSn);
