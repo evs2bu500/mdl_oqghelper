@@ -2,7 +2,8 @@ package com.pabu5h.evs2.oqghelper;
 
 import com.xt.utils.MathUtil;
 import com.xt.utils.SqlUtil;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,10 @@ public class QueryHelper {
     @Autowired
     private OqgHelper oqgHelper;
 
-    public final Logger logger;
+    private final Logger logger;
 
-    QueryHelper(Logger logger) {
-        this.logger = logger;
+    QueryHelper(Class<?> ApplicationClass) {
+        this.logger = LogManager.getLogger(ApplicationClass);
     }
 
     public String getMerterSnFromMeterDisplayname(String meterDisplayname) {
