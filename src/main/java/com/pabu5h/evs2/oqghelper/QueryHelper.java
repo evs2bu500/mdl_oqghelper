@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,68 @@ public class QueryHelper {
         return (meterSn.get(0).get("meter_sn") == null ? "" : meterSn.get(0).get("meter_sn").toString());
     }
 
+    public long getConcentratorIdFromMeterSn(String meterSnStr){
+        String sqlConcentrator = "select concentrator_id from meter where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> concentrator = new ArrayList<>();
+        try {
+            concentrator = oqgHelper.OqgR(sqlConcentrator);
+        } catch (Exception e) {
+            logger.error("Error getting concentrator_id for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(concentrator.isEmpty()){
+            logger.info("concentrator is empty for meterSn: " + meterSnStr);
+            return -1;
+        }
+        return MathUtil.ObjToLong(concentrator.get(0).get("concentrator_id")==null?-1:concentrator.get(0).get("concentrator_id"));
+    }
+    public Map<Long, Map<String, Object>> getConcentratorTariff(){
+        //get a list of concentrator_id from concentrator table
+        String sqlConcentrator = "select id from concentrator";
+        List<Map<String, Object>> concentrators = new ArrayList<>();
+        try {
+            concentrators = oqgHelper.OqgR(sqlConcentrator);
+        } catch (Exception e) {
+            logger.error("Error getting concentrator list");
+            throw new RuntimeException(e);
+        }
+
+        Map<Long, Map<String, Object>> concentratorTariff = new HashMap<>();
+
+        for(Map<String, Object> concentrator : concentrators) {
+            long concentratorId = MathUtil.ObjToLong(concentrator.get("id"));
+
+            //get tariff for this concentrator_id from concentrator_tariff table
+            String sqlTariff = "select offer_id, tariff_price from concentrator_tariff where concentrator_id = " + concentratorId;
+            List<Map<String, Object>> tariff = new ArrayList<>();
+            try {
+                tariff = oqgHelper.OqgR(sqlTariff);
+            } catch (Exception e) {
+                logger.error("Error getting tariff for concentratorId: " + concentratorId);
+                throw new RuntimeException(e);
+            }
+            if(tariff.isEmpty()){
+                logger.info("tariff is empty for concentratorId: " + concentratorId);
+                continue;
+            }
+            concentratorTariff.put(concentratorId,
+                    Map.of("tariff_price", MathUtil.ObjToDouble(tariff.get(0).get("tariff_price")),
+                            "offer_id", MathUtil.ObjToLong(tariff.get(0).get("offer_id"))));
+        }
+        return concentratorTariff;
+    }
+    public boolean meterSnExistsInMeterTable(String meterSnStr){
+        String sql = "select id from meter where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meter = new ArrayList<>();
+        try {
+            meter = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            logger.error("Error getting meter for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        return !meter.isEmpty();
+    }
+
     public void postMeterKiv(String meterSnStr,
                              String kivTag,
                              String postDateTimeStr,
@@ -46,6 +109,11 @@ public class QueryHelper {
                              String postedBy,
                              String sessionId){
         String meterKivTable = "meter_kiv";
+
+        if(!meterSnExistsInMeterTable(meterSnStr)){
+            logger.info("meter_sn: " + meterSnStr + " does not exist in meter table");
+            return;
+        }
 
         //check if the record for that session_id exists
         String sqlCheck = "select id, number_of_events from " + meterKivTable +
