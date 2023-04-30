@@ -16,7 +16,7 @@ public class QueryHelper {
     @Autowired
     private OqgHelper oqgHelper;
 
-    private final Logger logger;
+    public final Logger logger;
 
     QueryHelper(Logger logger) {
         this.logger = logger;
