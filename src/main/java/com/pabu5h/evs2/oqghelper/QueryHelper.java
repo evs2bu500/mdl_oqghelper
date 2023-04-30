@@ -23,6 +23,36 @@ public class QueryHelper {
     public QueryHelper(Logger logger) {
         this.logger = logger;
     }
+    public List<Map<String, Object>> getNewerMeterSnsFromTariffTable(){
+
+        List<Map<String, Object>> meterSns = new ArrayList<>();
+
+        // get all unique meterSns,
+        // meterSn must be at least 10 characters long
+        // and must start with 2018, 2019, 2020, 2021 and above
+        String sql = "select distinct meter_sn from tariff " +
+                "where meter_sn is not null and length(meter_sn) > 10 " +
+                "and (meter_sn like '2018%' " +
+                "  or meter_sn like '2019%' " +
+                "  or meter_sn like '2020%' " +
+                "  or meter_sn like '2021%'" +
+                "  or meter_sn like '2022%'" +
+                "  or meter_sn like '2023%'" +
+                "  or meter_sn like '2024%'" +
+                "  or meter_sn like '2025%'" +
+                "  or meter_sn like '2026%'" +
+                "  or meter_sn like '2027%'" +
+                "  or meter_sn like '2028%'" +
+                "  or meter_sn like '2029%'" +
+                "  or meter_sn like '2030%')";
+
+        try {
+            meterSns = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return meterSns;
+    }
 
     public String getMerterSnFromMeterDisplayname(String meterDisplayname) {
         String sqlMeterSn = "select meter_sn from meter where meter_displayname = '" + meterDisplayname + "'";
