@@ -70,6 +70,22 @@ public class QueryHelper {
         return (meterSn.get(0).get("meter_sn") == null ? "" : meterSn.get(0).get("meter_sn").toString());
     }
 
+    public List<Long> getConcentratorIDs(){
+        String sqlConcentrator = "select id from concentrator";
+        List<Map<String, Object>> concentratorIds = new ArrayList<>();
+        try {
+            concentratorIds = oqgHelper.OqgR(sqlConcentrator);
+        } catch (Exception e) {
+            logger.error("Error getting concentrator IDs");
+            throw new RuntimeException(e);
+        }
+        if(concentratorIds.isEmpty()){
+            logger.info("no concentrator IDs found");
+            return new ArrayList<>();
+        }
+        return concentratorIds.stream().map(concentratorId -> MathUtil.ObjToLong(concentratorId.get("id"))).toList();
+    }
+
     public long getConcentratorIdFromMeterSn(String meterSnStr){
         String sqlConcentrator = "select concentrator_id from meter where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> concentrator = new ArrayList<>();
