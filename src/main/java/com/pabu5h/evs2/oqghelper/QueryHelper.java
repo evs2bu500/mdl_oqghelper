@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class QueryHelper {
@@ -145,6 +142,9 @@ public class QueryHelper {
 
         if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
             postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+        }
+        if(sessionId == null || sessionId.isEmpty()) {
+            sessionId = UUID.randomUUID().toString();
         }
 
         if(!meterSnExistsInMeterTable(meterSnStr)){
