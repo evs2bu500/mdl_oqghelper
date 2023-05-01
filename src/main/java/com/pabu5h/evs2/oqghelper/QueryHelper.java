@@ -1,5 +1,6 @@
 package com.pabu5h.evs2.oqghelper;
 
+import com.xt.utils.DateTimeUtil;
 import com.xt.utils.MathUtil;
 import com.xt.utils.SqlUtil;
 import org.apache.logging.log4j.LogManager;
@@ -7,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -139,6 +142,10 @@ public class QueryHelper {
                              String postedBy,
                              String sessionId){
         String meterKivTable = "meter_kiv";
+
+        if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+        }
 
         if(!meterSnExistsInMeterTable(meterSnStr)){
             logger.info("meter_sn: " + meterSnStr + " does not exist in meter table");
