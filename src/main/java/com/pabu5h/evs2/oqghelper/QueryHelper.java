@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
+import static java.util.Collections.singletonMap;
+
 @Service
 public class QueryHelper {
 
@@ -68,6 +70,26 @@ public class QueryHelper {
             return "";
         }
         return (meterSn.get(0).get("meter_sn") == null ? "" : meterSn.get(0).get("meter_sn").toString());
+    }
+
+    public Map<String, Object> getLatestMeterCredit(String meterSnStr, String tableName){
+        if(tableName == null || tableName.isBlank()){
+            tableName = "meter_tariff";
+        }
+        String sqlMeterCredit = "select ref_bal from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
+                " and ref_bal is not null order by id desc limit 1";
+        List<Map<String, Object>> meterCredit = new ArrayList<>();
+        try {
+            meterCredit = oqgHelper.OqgR(sqlMeterCredit);
+        } catch (Exception e) {
+            logger.error("Error getting credit for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(meterCredit.isEmpty()){
+            logger.info("ref_bal is empty for meterSn: " + meterSnStr);
+            return Collections.singletonMap("info", "ref_bal is empty for meterSn: " + meterSnStr);
+        }
+        return meterCredit.get(0);
     }
 
     public List<Long> getConcentratorIDs(){
@@ -216,4 +238,6 @@ public class QueryHelper {
             }
         }
     }
+
+
 }
