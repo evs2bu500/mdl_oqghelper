@@ -170,6 +170,26 @@ public class QueryHelper {
         return !meter.isEmpty();
     }
 
+    public Map<String, Object> getEpochRefBalTimeStamp(String meterSnStr, String tableName){
+        if(tableName == null || tableName.isBlank()){
+            tableName = "meter_tariff";
+        }
+        String sqlMeterCredit = "select tariff_timestamp from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
+                " and ref_bal_tag = 'ref_bal_epoch' order by id desc limit 1";
+        List<Map<String, Object>> meterCredit = new ArrayList<>();
+        try {
+            meterCredit = oqgHelper.OqgR(sqlMeterCredit);
+        } catch (Exception e) {
+            logger.error("Error getting credit for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(meterCredit.isEmpty()){
+            logger.info("epoch_ref_bal is empty for meterSn: " + meterSnStr);
+            return Collections.singletonMap("info", "epoch_ref_bal is empty for meterSn: " + meterSnStr);
+        }
+        return meterCredit.get(0);
+    }
+
     public void postMeterKiv(String meterSnStr,
                              String kivTag,
                              String postDateTimeStr,
