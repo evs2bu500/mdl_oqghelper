@@ -58,7 +58,22 @@ public class QueryHelper {
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
 
-    public String getMerterSnFromMeterDisplayname(String meterDisplayname) {
+    public List<String> getNewerMeterSnsFromMeterReadingTable(){
+        List<Map<String, Object>> meterSns = new ArrayList<>();
+
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select distinct meter_sn from meter_reading " +
+                " where kwh_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+
+        try {
+            meterSns = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+    }
+
+    public String getMeterSnFromMeterDisplayname(String meterDisplayname) {
         String sqlMeterSn = "select meter_sn from meter where meter_displayname = '" + meterDisplayname + "'";
         List<Map<String, Object>> meterSn = new ArrayList<>();
         try {
@@ -87,7 +102,7 @@ public class QueryHelper {
 
         String meterSnStr = "";
         try {
-            meterSnStr = getMerterSnFromMeterDisplayname(meterDisplayName);
+            meterSnStr = getMeterSnFromMeterDisplayname(meterDisplayName);
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("error", "Error getting meter_sn for meterDisplayname: " + meterDisplayName));
