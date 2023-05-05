@@ -58,12 +58,26 @@ public class QueryHelper {
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
 
-    public List<String> getNewerMeterSnsFromMeterReadingTable(){
+    public List<String> getActiveMeterSnsFromMeterReadingTable(){
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
         String sql = "select distinct meter_sn from meter_reading " +
                 " where kwh_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+
+        try {
+            meterSns = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+    }
+
+    public List<String> getAllMeterSnsFromMeterReadingTable(){
+        List<Map<String, Object>> meterSns = new ArrayList<>();
+
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select distinct meter_sn from meter_reading";
 
         try {
             meterSns = oqgHelper.OqgR(sql);
