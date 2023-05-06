@@ -330,9 +330,8 @@ public class QueryHelper {
         }
     }
 
-    public void postOpLog(String meterSnStr,
+    public void postOpLog(String postDateTimeStr,
                           String username,
-                          String postDateTimeStr,
                           String target,
                           String operation,
                           String targetSpec,
@@ -349,11 +348,6 @@ public class QueryHelper {
             sessionId = UUID.randomUUID().toString();
         }
 
-        if(!meterSnExistsInMeterTable(meterSnStr)){
-            logger.info("meter_sn: " + meterSnStr + " does not exist in meter table");
-            return;
-        }
-
         Map<String, Object> oplogSqlMap = Map.of("table", opsLogTable,
                 "content", Map.of(
                         "op_timestamp", postDateTimeStr,
@@ -368,13 +362,13 @@ public class QueryHelper {
                 ));
         Map<String, String> sqlInsert = SqlUtil.makeInsertSql(oplogSqlMap);
         if(sqlInsert.get("sql")==null){
-            logger.error("Error getting insert sql for opsLogTable for meterSn: " + meterSnStr);
-            throw new RuntimeException("Error getting insert sql for opsLogTable for meterSn: " + meterSnStr);
+            logger.error("Error getting insert sql for opsLogTable");
+            throw new RuntimeException("Error getting insert sql for opsLogTable");
         }
         try {
             oqgHelper.OqgIU(sqlInsert.get("sql"));
         } catch (Exception e) {
-            logger.error("Error inserting opsLogTable for meterSn: " + meterSnStr);
+            logger.error("Error inserting opsLogTable");
             throw new RuntimeException(e);
         }
     }
