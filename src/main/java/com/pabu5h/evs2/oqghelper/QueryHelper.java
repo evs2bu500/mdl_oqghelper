@@ -330,5 +330,53 @@ public class QueryHelper {
         }
     }
 
+    public void postOpLog(String meterSnStr,
+                          String username,
+                          String postDateTimeStr,
+                          String target,
+                          String operation,
+                          String targetSpec,
+                          String opRef,
+                          double opVal,
+                          String remark,
+                          String sessionId){
+        String opsLogTable = "evs2_op_log";
+
+        if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+        }
+        if(sessionId == null || sessionId.isEmpty()) {
+            sessionId = UUID.randomUUID().toString();
+        }
+
+        if(!meterSnExistsInMeterTable(meterSnStr)){
+            logger.info("meter_sn: " + meterSnStr + " does not exist in meter table");
+            return;
+        }
+
+        Map<String, Object> oplogSqlMap = Map.of("table", opsLogTable,
+                "content", Map.of(
+                        "op_timestamp", postDateTimeStr,
+                        "username", username,
+                        "evs2_acl_target", target,
+                        "target_spec", targetSpec,
+                        "evs2_acl_operation", operation,
+                        "op_ref", opRef,
+                        "op_val", opVal,
+                        "remark", remark,
+                        "session_id", sessionId
+                ));
+        Map<String, String> sqlInsert = SqlUtil.makeInsertSql(oplogSqlMap);
+        if(sqlInsert.get("sql")==null){
+            logger.error("Error getting insert sql for opsLogTable for meterSn: " + meterSnStr);
+            throw new RuntimeException("Error getting insert sql for opsLogTable for meterSn: " + meterSnStr);
+        }
+        try {
+            oqgHelper.OqgIU(sqlInsert.get("sql"));
+        } catch (Exception e) {
+            logger.error("Error inserting opsLogTable for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+    }
 
 }
