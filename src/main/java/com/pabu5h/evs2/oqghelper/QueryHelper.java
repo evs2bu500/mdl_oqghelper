@@ -157,6 +157,33 @@ public class QueryHelper {
         }
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
     }
+    public double getAllTopupAmount(){
+        List<Map<String, Object>>topupTotal = new ArrayList<>();
+
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+//        String sql = "select sum(credit_amt) as credit_total from meter_tariff " +
+//                " where credit_amt is not null " +
+//                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+        String sql = "select sum(topup_amt) as topup_total from transaction_log " +
+                " where topup_amt is not null " +
+                " and transaction_status = 3 " +
+                " and payment_mode != 4" +
+                " and response_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+        try {
+            topupTotal = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(topupTotal.size() == 0){
+            return 0;
+        }
+        //sum() will always return a value, even if there is no data, the list will still have 1 element
+        if(topupTotal.get(0).get("credit_total") == null){
+            return 0;
+        }
+        return Double.parseDouble(topupTotal.get(0).get("topup_total").toString());
+    }
+
 
     public List<String> getAllMeterSns(String tableName){
         if(tableName ==null || tableName.isEmpty()){
