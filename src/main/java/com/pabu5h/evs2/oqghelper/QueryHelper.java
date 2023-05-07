@@ -83,7 +83,7 @@ public class QueryHelper {
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
 
-    public List<String> getActiveMeterCount(String tableName){
+    public long getActiveMeterCount(String tableName){
         String timekey = "kwh_timestamp";
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
@@ -94,18 +94,18 @@ public class QueryHelper {
             timekey = "tariff_timestamp";
         }
 
-        List<Map<String, Object>> meterSns = new ArrayList<>();
+        List<Map<String, Object>> count = new ArrayList<>();
 
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
         String sql = "select count(distinct meter_sn) from " + tableName +
                 " where " + timekey + " > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
-            meterSns = oqgHelper.OqgR(sql);
+            count = oqgHelper.OqgR(sql);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+        return Long.parseLong(count.get(0).get("count").toString());
     }
 
     public List<String> getAllMeterSns(String tableName){
