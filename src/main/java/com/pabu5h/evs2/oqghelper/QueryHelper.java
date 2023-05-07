@@ -178,7 +178,7 @@ public class QueryHelper {
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
-        if(topupTotal.get(0).get("credit_total") == null){
+        if(topupTotal.get(0).get("topup_total") == null){
             return 0;
         }
         return Double.parseDouble(topupTotal.get(0).get("topup_total").toString());
