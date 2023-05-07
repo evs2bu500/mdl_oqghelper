@@ -73,11 +73,16 @@ public class QueryHelper {
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
 
-    public List<String> getAllMeterSnsFromMeterReadingTable(){
+    public List<String> getActiveMeterCount(String tableName){
+        if(tableName ==null || tableName.isEmpty()){
+            tableName = "meter_tariff";
+        }
+
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
-        String sql = "select distinct meter_sn from meter_reading";
+        String sql = "select count(distinct meter_sn) from " + tableName +
+                " where kwh_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
             meterSns = oqgHelper.OqgR(sql);
@@ -87,10 +92,15 @@ public class QueryHelper {
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
 
-    public List<String> getMeterSnsFromMeterTariffTable(){
+    public List<String> getAllMeterSns(String tableName){
+        if(tableName ==null || tableName.isEmpty()){
+            tableName = "meter_tariff";
+        }
+
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
-        String sql = "select distinct meter_sn from meter_tariff";
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select distinct meter_sn from " + tableName;
 
         try {
             meterSns = oqgHelper.OqgR(sql);
@@ -99,6 +109,19 @@ public class QueryHelper {
         }
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
+
+//    public List<String> getMeterSnsFromMeterTariffTable(){
+//        List<Map<String, Object>> meterSns = new ArrayList<>();
+//
+//        String sql = "select distinct meter_sn from meter_tariff";
+//
+//        try {
+//            meterSns = oqgHelper.OqgR(sql);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+//    }
 
     public String getMeterSnFromMeterDisplayname(String meterDisplayname) {
         String sqlMeterSn = "select meter_sn from meter where meter_displayname = '" + meterDisplayname + "'";
