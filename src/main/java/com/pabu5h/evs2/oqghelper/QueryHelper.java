@@ -117,7 +117,8 @@ public class QueryHelper {
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
         String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
                 "where meter_sn = '" + meterSnStr + "' " +
-                "and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+                " and kwh_diff is not null " +
+                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
             kwhConsumption = oqgHelper.OqgR(sql);
