@@ -105,6 +105,9 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        if(count.size() == 0){
+            return 0;
+        }
         return Long.parseLong(count.get(0).get("count").toString());
     }
 
@@ -120,6 +123,9 @@ public class QueryHelper {
             kwhConsumption = oqgHelper.OqgR(sql);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        if(kwhConsumption.size() == 0){
+            return 0;
         }
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
     }
