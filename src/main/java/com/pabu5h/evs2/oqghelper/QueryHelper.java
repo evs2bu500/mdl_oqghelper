@@ -116,8 +116,31 @@ public class QueryHelper {
 
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
         String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
-                "where meter_sn = '" + meterSnStr + "' " +
+                " where meter_sn = '" + meterSnStr + "' " +
                 " and kwh_diff is not null " +
+                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+
+        try {
+            kwhConsumption = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(kwhConsumption.size() == 0){
+            return 0;
+        }
+        //sum() will always return a value, even if there is no data, the list will still have 1 element
+        if(kwhConsumption.get(0).get("kwh_total") == null){
+            return 0;
+        }
+        return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
+    }
+
+    public double getAllActiveKwhConsumption(){
+        List<Map<String, Object>> kwhConsumption = new ArrayList<>();
+
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
+                " where kwh_diff is not null " +
                 " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
