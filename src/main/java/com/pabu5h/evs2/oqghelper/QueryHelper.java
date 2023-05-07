@@ -58,12 +58,18 @@ public class QueryHelper {
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
     }
 
-    public List<String> getActiveMeterSnsFromMeterReadingTable(){
+    public List<String> getActiveMeterSns(String tableName){
+        String timekey = "kwh_timestamp";
+        if(tableName ==null || tableName.isEmpty()){
+            tableName = "meter_tariff";
+            timekey = "tariff_timestamp";
+        }
+
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
-        String sql = "select distinct meter_sn from meter_reading " +
-                " where kwh_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+        String sql = "select distinct meter_sn from " + tableName +
+                " where " + timekey + " > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
             meterSns = oqgHelper.OqgR(sql);
@@ -74,15 +80,17 @@ public class QueryHelper {
     }
 
     public List<String> getActiveMeterCount(String tableName){
+        String timekey = "kwh_timestamp";
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
+            timekey = "tariff_timestamp";
         }
 
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
         String sql = "select count(distinct meter_sn) from " + tableName +
-                " where kwh_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+                " where " + timekey + " > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
             meterSns = oqgHelper.OqgR(sql);
