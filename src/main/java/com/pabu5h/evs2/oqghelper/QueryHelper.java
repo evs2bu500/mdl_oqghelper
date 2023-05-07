@@ -108,6 +108,22 @@ public class QueryHelper {
         return Long.parseLong(count.get(0).get("count").toString());
     }
 
+    public double getActiveKwhConsumption(String meterSnStr){
+        List<Map<String, Object>> kwhConsumption = new ArrayList<>();
+
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
+                "where meter_sn = '" + meterSnStr + "' " +
+                "and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+
+        try {
+            kwhConsumption = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
+    }
+
     public List<String> getAllMeterSns(String tableName){
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
