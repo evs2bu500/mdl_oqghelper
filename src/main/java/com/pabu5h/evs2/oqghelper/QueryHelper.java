@@ -518,6 +518,20 @@ public class QueryHelper {
         }
     }
 
+    public Map<String, Object> getRecentMeterKiv(){
+        List<Map<String, Object>>meterKiv = new ArrayList<>();
+
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select * from meter_kiv " +
+                " where kiv_tag != 'missing_ref_bal_epoch' " +
+                " and kiv_start_timestamp > timestamp '" + sgNow + "' - interval '72 hours' ";
+        try {
+            meterKiv = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return Map.of("meter_kiv", meterKiv);
+    }
 
     public void postOpLog(String postDateTimeStr,
                           String username,
