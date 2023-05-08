@@ -524,7 +524,8 @@ public class QueryHelper {
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
         String sql = "select * from meter_kiv " +
                 " where kiv_tag != 'missing_ref_bal_epoch' " +
-                " and kiv_start_timestamp > timestamp '" + sgNow + "' - interval '72 hours' ";
+                " and kiv_start_timestamp > timestamp '" + sgNow + "' - interval '72 hours' "
+                + " order by kiv_start_timestamp desc";
         try {
             meterKiv = oqgHelper.OqgR(sql);
         } catch (Exception e) {
