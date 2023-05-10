@@ -552,7 +552,7 @@ public class QueryHelper {
                 " and kwh_diff is not null " +
                 " and reading_interval is not null " +
                 " order by tariff_timestamp desc " +
-                " limit 13";
+                " limit 8";
         List<Map<String, Object>> intervals = new ArrayList<>();
         try {
             intervals = oqgHelper.OqgR(sql);
@@ -560,7 +560,10 @@ public class QueryHelper {
             logger.error("Error getting meter tariff for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
-        if(intervals.isEmpty()){
+//        if(intervals.isEmpty()){
+//            return 0;
+//        }
+        if(intervals.size()<8){
             return 0;
         }
         List<Double> intervalList = new ArrayList<>();
