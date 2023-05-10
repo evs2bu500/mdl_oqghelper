@@ -1,5 +1,6 @@
 package com.pabu5h.evs2.oqghelper;
 
+import com.pabu5h.evs2.dto.MeterInfoDto;
 import com.xt.utils.DateTimeUtil;
 import com.xt.utils.MathUtil;
 import com.xt.utils.SqlUtil;
@@ -81,6 +82,33 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
         return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+    }
+
+    public Map<String, Object> getMeterInfo(String meterSnStr){
+        String sql = "select * from meter where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "meter not found");
+        }
+        return meterInfo.get(0);
+    }
+    public List<Map<String, Object>> getAllMeterInfo(){
+        String sql = "select meter_sn, meter_displayname, reading_interval, commission_timestamp" +
+                " unit, street, block, building" +
+                " from meter" +
+                " inner join premise p on meter.premise_id = p.id";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return meterInfo;
     }
 
     public long getActiveMeterCount(String tableName){
