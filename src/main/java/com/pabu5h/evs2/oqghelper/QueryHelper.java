@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonMap;
 
@@ -544,6 +545,27 @@ public class QueryHelper {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public long findMeterReadingInterval(String meterSnStr){
+        String sql = "select interval from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+                " and debit_amt is not null " +
+                " and interval is not null " +
+                " order by tariff_timestamp desc " +
+                " limit 13";
+        List<Map<String, Object>> intervals = new ArrayList<>();
+        try {
+            intervals = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            logger.error("Error getting meter tariff for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(intervals.isEmpty()){
+            return 0;
+        }
+        List<Double> intervalList = new ArrayList<>();
+        intervalList = intervals.stream().map(m -> MathUtil.ObjToDouble(m.get("interval"))/60).collect(Collectors.toList());
+        return MathUtil.findDominantLong(intervalList);
     }
 
     public Map<String, Object> getRecentMeterKiv(){
