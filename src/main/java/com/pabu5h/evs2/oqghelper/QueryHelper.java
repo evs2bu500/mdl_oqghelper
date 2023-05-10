@@ -548,9 +548,9 @@ public class QueryHelper {
     }
 
     public long findMeterReadingInterval(String meterSnStr){
-        String sql = "select meter_tariff.interval from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+        String sql = "select reading_interval from meter_tariff where meter_sn = '" + meterSnStr + "'" +
                 " and kwh_diff is not null " +
-                " and meter_tariff.interval is not null " +
+                " and reading_interval is not null " +
                 " order by tariff_timestamp desc " +
                 " limit 13";
         List<Map<String, Object>> intervals = new ArrayList<>();
@@ -564,7 +564,7 @@ public class QueryHelper {
             return 0;
         }
         List<Double> intervalList = new ArrayList<>();
-        intervalList = intervals.stream().map(m -> MathUtil.ObjToDouble(m.get("interval"))/60).collect(Collectors.toList());
+        intervalList = intervals.stream().map(m -> MathUtil.ObjToDouble(m.get("reading_interval"))/60).collect(Collectors.toList());
         return MathUtil.findDominantLong(intervalList);
     }
     public void updateMeterReadingInterval(String meterSnStr, long interval){
