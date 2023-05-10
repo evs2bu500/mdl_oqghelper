@@ -567,6 +567,16 @@ public class QueryHelper {
         intervalList = intervals.stream().map(m -> MathUtil.ObjToDouble(m.get("interval"))/60).collect(Collectors.toList());
         return MathUtil.findDominantLong(intervalList);
     }
+    public void updateMeterReadingInterval(String meterSnStr, long interval){
+        String sql = "update meter set reading_interval = " + interval +
+                " where meter_sn = '" + meterSnStr + "'" ;
+        try {
+            oqgHelper.OqgIU(sql);
+        } catch (Exception e) {
+            logger.error("Error updating meter tariff for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+    }
 
     public Map<String, Object> getRecentMeterKiv(){
         List<Map<String, Object>>meterKiv = new ArrayList<>();
