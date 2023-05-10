@@ -548,9 +548,9 @@ public class QueryHelper {
     }
 
     public long findMeterReadingInterval(String meterSnStr){
-        String sql = "select interval from meter_tariff where meter_sn = '" + meterSnStr + "'" +
-                " and debit_amt is not null " +
-                " and interval is not null " +
+        String sql = "select meter_tariff.interval from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+                " and kwh_diff is not null " +
+                " and meter_tariff.interval is not null " +
                 " order by tariff_timestamp desc " +
                 " limit 13";
         List<Map<String, Object>> intervals = new ArrayList<>();
