@@ -576,11 +576,20 @@ public class QueryHelper {
         try {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
-            logger.error("Error updating meter tariff for meterSn: " + meterSnStr);
+            logger.error("Error updating meter reading interval for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
     }
-
+    public void updateMeterMeterMmsAddress(String meterSnStr, String mmsAddress){
+        String sql = "update meter set mms_address = '" + mmsAddress +
+                "' where meter_sn = '" + meterSnStr + "'" ;
+        try {
+            oqgHelper.OqgIU(sql);
+        } catch (Exception e) {
+            logger.error("Error updating meter mms address for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+    }
     public Map<String, Object> getRecentMeterKiv(){
         List<Map<String, Object>>meterKiv = new ArrayList<>();
 
