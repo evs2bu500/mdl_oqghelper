@@ -600,10 +600,10 @@ public class QueryHelper {
                             Map.entry("kiv_status","posted"),
                             Map.entry("kiv_ref", kivRefValMap.keySet().toArray()[0]),
                             Map.entry("kiv_val", kivRefValMap.values().toArray()[0]),
-                            Map.entry("kiv_ref1", kivRefValMap.keySet().toArray()[1]),
-                            Map.entry("kiv_val1", kivRefValMap.values().toArray()[1]),
-                            Map.entry("kiv_ref2", kivRefValMap.keySet().toArray()[2]),
-                            Map.entry("kiv_val2", kivRefValMap.values().toArray()[2]),
+                            Map.entry("kiv_ref2", kivRefValMap.keySet().toArray()[1]),
+                            Map.entry("kiv_val2", kivRefValMap.values().toArray()[1]),
+                            Map.entry("kiv_ref3", kivRefValMap.keySet().toArray()[2]),
+                            Map.entry("kiv_val3", kivRefValMap.values().toArray()[2]),
                             Map.entry("posted_by", postedBy),
                             Map.entry("session_id", sessionId)
                     ));
