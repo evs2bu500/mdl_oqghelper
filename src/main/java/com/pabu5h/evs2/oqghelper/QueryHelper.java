@@ -558,6 +558,82 @@ public class QueryHelper {
         }
     }
 
+    public void postMeterKiv3(String meterSnStr,
+                              String kivTag,
+                              String postDateTimeStr,
+                              long numOfEvents,
+                              Map<String, Double> kivRefValMap,
+                              String postedBy,
+                              String sessionId){
+        String meterKivTable = "meter_kiv";
+
+        if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+        }
+        if(sessionId == null || sessionId.isEmpty()) {
+            sessionId = UUID.randomUUID().toString();
+        }
+
+        if(!meterSnExistsInMeterTable(meterSnStr)){
+            logger.info("meter_sn: " + meterSnStr + " does not exist in meter table");
+            return;
+        }
+
+        //check if the record for that session_id exists
+        String sqlCheck = "select id, number_of_events from " + meterKivTable +
+                " where meter_sn = '" + meterSnStr +
+                "' and session_id = '" + sessionId + "'";
+        List<Map<String, Object>> meterKiv = new ArrayList<>();
+        try {
+            meterKiv = oqgHelper.OqgR(sqlCheck);
+        } catch (Exception e) {
+            logger.error("Error getting meterKiv for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(meterKiv.isEmpty()) {
+            Map<String, Object> kivSqlMap = Map.of("table", meterKivTable,
+                    "content", Map.ofEntries(
+                            Map.entry("meter_sn", meterSnStr),
+                            Map.entry("kiv_tag", kivTag),
+                            Map.entry("kiv_start_timestamp", postDateTimeStr),
+                            Map.entry("number_of_events", numOfEvents),
+                            Map.entry("kiv_status","posted"),
+                            Map.entry("kiv_ref", kivRefValMap.keySet().toArray()[0]),
+                            Map.entry("kiv_val", kivRefValMap.values().toArray()[0]),
+                            Map.entry("kiv_ref1", kivRefValMap.keySet().toArray()[1]),
+                            Map.entry("kiv_val1", kivRefValMap.values().toArray()[1]),
+                            Map.entry("kiv_ref2", kivRefValMap.keySet().toArray()[2]),
+                            Map.entry("kiv_val2", kivRefValMap.values().toArray()[2]),
+                            Map.entry("posted_by", postedBy),
+                            Map.entry("session_id", sessionId)
+                    ));
+            Map<String, String> sqlInsert = SqlUtil.makeInsertSql(kivSqlMap);
+            if(sqlInsert.get("sql")==null){
+                logger.error("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
+                throw new RuntimeException("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
+            }
+            try {
+                oqgHelper.OqgIU(sqlInsert.get("sql"));
+            } catch (Exception e) {
+                logger.error("Error inserting meterKiv for meterSn: " + meterSnStr);
+                throw new RuntimeException(e);
+            }
+        } else {
+            //update the record
+            long id = MathUtil.ObjToLong(meterKiv.get(0).get("id"));
+            long numOfEventsOld = MathUtil.ObjToLong(meterKiv.get(0).get("number_of_events")==null?0:meterKiv.get(0).get("number_of_events"));
+            long numOfEventsNew = numOfEventsOld + numOfEvents;
+            String sqlUpdate = "update " + meterKivTable + " set number_of_events = " + numOfEventsNew +
+                    " where id = " + id;
+            try {
+                oqgHelper.OqgIU(sqlUpdate);
+            } catch (Exception e) {
+                logger.error("Error updating meterKiv for meterSn: " + meterSnStr);
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public long findMeterReadingInterval(String meterSnStr){
         String sql = "select reading_interval from meter_tariff where meter_sn = '" + meterSnStr + "'" +
                 " and kwh_diff is not null " +
