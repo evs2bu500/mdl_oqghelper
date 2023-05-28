@@ -685,6 +685,7 @@ public class QueryHelper {
         String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
         String sql = "select * from meter_kiv " +
                 " where kiv_tag != 'missing_ref_bal_epoch' " +
+                " and kiv_tag != 'reading_interval' " +
                 " and kiv_start_timestamp > timestamp '" + sgNow + "' - interval '72 hours' "
                 + " order by kiv_start_timestamp desc";
         try {
