@@ -591,6 +591,8 @@ public class QueryHelper {
         }
     }
     public void updateMeterMeterMmsAddress(String meterSnStr, String mmsAddress){
+        //add escape character for single quote
+        mmsAddress = mmsAddress.replace("'", "''");
         String sql = "update meter set mms_address = '" + mmsAddress +
                 "' where meter_sn = '" + meterSnStr + "'" ;
         try {
