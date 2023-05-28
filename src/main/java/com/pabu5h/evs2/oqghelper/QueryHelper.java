@@ -111,6 +111,16 @@ public class QueryHelper {
         }
         return meterInfo;
     }
+    public List<Map<String, Object>> getAllMeterInfo2(){
+        String sql = "select meter_sn, meter_displayname, reading_interval, commission_timestamp, mms_address";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return meterInfo;
+    }
 
     public long getActiveMeterCount(String tableName){
         String timekey = "kwh_timestamp";
