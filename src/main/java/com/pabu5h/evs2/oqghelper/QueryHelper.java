@@ -189,6 +189,9 @@ public class QueryHelper {
                 queryBuilder.append(" UNION ALL ");
             }
         }
+        // Build the outer query to sort the result by date in descending order
+        queryBuilder.insert(0, "SELECT * FROM (")
+                .append(") AS subquery ORDER BY date DESC");
 
         // Store the final SQL query string
         String sql = queryBuilder.toString();
