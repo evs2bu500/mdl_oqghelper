@@ -171,8 +171,10 @@ public class QueryHelper {
         // Iterate over the past 7 days
         for (int i = 0; i < days; i++) {
             // Subtract i days from the current date
-            LocalDateTime sgNow = DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now(), ZoneId.of("Asia/Singapore"));
-            String sgNowStr = DateTimeUtil.getZonedDateTimeStr(now().minusDays(i), ZoneId.of("Asia/Singapore"));
+            LocalDateTime sgNow =
+                    DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now(), ZoneId.of("Asia/Singapore"))
+                            .minusDays(i);
+            String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
 
             // Append the SQL statement for each day to the query builder
             queryBuilder.append("SELECT '").append(sgNow.toLocalDate()).append("' AS date, COUNT(DISTINCT meter_sn) FROM ")
