@@ -176,13 +176,18 @@ public class QueryHelper {
             String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
 
             // Append the SQL statement for each day to the query builder
-            queryBuilder.append("SELECT '").append(sgNow.toLocalDate()).append("' AS date, COUNT(DISTINCT meter_sn) FROM ")
+            queryBuilder.append("SELECT '").append(sgNowStr).append("' AS date, COUNT(DISTINCT meter_sn) FROM ")
                     .append(tableName)
                     .append(" WHERE ")
                     .append(timekey)
                     .append(" > TIMESTAMP '")
                     .append(sgNowStr)
-                    .append("' - INTERVAL '24 hours'");
+                    .append("' - INTERVAL '24 hours'")
+                    .append(" AND ")
+                    .append(timekey)
+                    .append(" <= TIMESTAMP '")
+                    .append(sgNowStr)
+                    .append("'");
 
             // Add a UNION ALL between each statement except the last one
             if (i < days - 1) {
