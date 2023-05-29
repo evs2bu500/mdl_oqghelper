@@ -204,6 +204,10 @@ public class QueryHelper {
         if(count.size() == 0){
             return Collections.singletonMap("info", "no data");
         }
+        //sort by date in descending order
+        count.sort(Comparator.comparing(m -> m.get("date").toString()));
+        Collections.reverse(count);
+
         return Collections.singletonMap("active_meter_count_history", count);
     }
 
