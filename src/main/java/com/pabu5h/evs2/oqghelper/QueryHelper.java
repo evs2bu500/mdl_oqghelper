@@ -172,8 +172,7 @@ public class QueryHelper {
         for (int i = 0; i < days; i++) {
             // Subtract i days from the current date
             LocalDateTime sgNow =
-                    DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now(), ZoneId.of("Asia/Singapore"))
-                            .minusDays(i);
+                    DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now().minusDays(i), ZoneId.of("Asia/Singapore"));
             String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
 
             // Append the SQL statement for each day to the query builder
