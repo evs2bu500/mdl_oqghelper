@@ -151,6 +151,56 @@ public class QueryHelper {
         return Long.parseLong(count.get(0).get("count").toString());
     }
 
+    public List<Long> getActiveMeterCountHistory(String tableName, int days){
+        String timekey = "kwh_timestamp";
+        if(tableName ==null || tableName.isEmpty()){
+            tableName = "meter_tariff";
+            timekey = "tariff_timestamp";
+        }
+
+        if(tableName.equals("meter_tariff")){
+            timekey = "tariff_timestamp";
+        }
+
+        List<Map<String, Object>> count = new ArrayList<>();
+
+        // Create a StringBuilder to build the SQL query
+        StringBuilder queryBuilder = new StringBuilder();
+
+        // Iterate over the past 7 days
+        for (int i = 0; i < days; i++) {
+            // Subtract i days from the current date
+            String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now().minusDays(i), ZoneId.of("Asia/Singapore"));
+
+            // Append the SQL statement for each day to the query builder
+            queryBuilder.append("SELECT COUNT(DISTINCT meter_sn) FROM ")
+                    .append(tableName)
+                    .append(" WHERE ")
+                    .append(timekey)
+                    .append(" > TIMESTAMP '")
+                    .append(sgNow)
+                    .append("' - INTERVAL '24 hours'");
+
+            // Add a UNION ALL between each statement except the last one
+            if (i < days - 1) {
+                queryBuilder.append(" UNION ALL ");
+            }
+        }
+
+        // Store the final SQL query string
+        String sql = queryBuilder.toString();
+
+        try {
+            count = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(count.size() == 0){
+            return null;
+        }
+        return count.stream().map(c -> Long.parseLong(c.get("count").toString())).toList();
+    }
+
     public double getActiveKwhConsumption(String meterSnStr){
         List<Map<String, Object>> kwhConsumption = new ArrayList<>();
 
