@@ -240,7 +240,14 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+//        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+        List<String> meterSnList = new ArrayList<>();
+        for(Map<String, Object> meterSn : meterSns){
+            if(meterSn.get("meter_sn") != null){
+                meterSnList.add(meterSn.get("meter_sn").toString());
+            }
+        }
+        return meterSnList;
     }
 
 //    public List<String> getMeterSnsFromMeterTariffTable(){
