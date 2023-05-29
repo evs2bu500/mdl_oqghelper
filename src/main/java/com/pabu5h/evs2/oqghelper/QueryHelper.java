@@ -176,7 +176,9 @@ public class QueryHelper {
             String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
 
             // Append the SQL statement for each day to the query builder
-            queryBuilder.append("SELECT '").append(sgNowStr).append("' AS date, COUNT(DISTINCT meter_sn) FROM ")
+            queryBuilder.append("SELECT '")
+                    .append(sgNowStr)
+                    .append("' AS timestamp, COUNT(DISTINCT meter_sn) FROM ")
                     .append(tableName)
                     .append(" WHERE ")
                     .append(timekey)
