@@ -152,7 +152,7 @@ public class QueryHelper {
         return Long.parseLong(count.get(0).get("count").toString());
     }
 
-    public List<Long> getActiveMeterCountHistory(String tableName, int days){
+    public Map<String, Object> getActiveMeterCountHistory(String tableName, int days){
         String timekey = "kwh_timestamp";
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
@@ -198,9 +198,9 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
         if(count.size() == 0){
-            return null;
+            return Collections.singletonMap("info", "no data");
         }
-        return count.stream().map(c -> Long.parseLong(c.get("count").toString())).toList();
+        return Collections.singletonMap("active_meter_count_history", count);
     }
 
     public double getActiveKwhConsumption(String meterSnStr){
