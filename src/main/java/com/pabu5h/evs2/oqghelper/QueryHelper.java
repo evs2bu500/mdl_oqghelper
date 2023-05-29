@@ -562,7 +562,7 @@ public class QueryHelper {
                               String kivTag,
                               String postDateTimeStr,
                               long numOfEvents,
-                              Map<String, Double> kivRefValMap,
+                              LinkedHashMap<String, Double> kivRefValMap,
                               String postedBy,
                               String sessionId){
         String meterKivTable = "meter_kiv";
