@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.0</version>
+		<version>3.0.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.pabu5h.evs2</groupId>
 	<artifactId>oqghelper</artifactId>
-	<version>1.23.2</version>
+	<version>1.23.3</version>
 	<name>OqgHelper</name>
 	<description>OqgHelper</description>
 

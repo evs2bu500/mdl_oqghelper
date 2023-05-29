@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonMap;
 
 @Service
@@ -73,7 +74,7 @@ public class QueryHelper {
 
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String sql = "select distinct meter_sn from " + tableName +
                 " where " + timekey + " > timestamp '" + sgNow + "' - interval '24 hours' ";
 
@@ -136,7 +137,7 @@ public class QueryHelper {
 
         List<Map<String, Object>> count = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String sql = "select count(distinct meter_sn) from " + tableName +
                 " where " + timekey + " > timestamp '" + sgNow + "' - interval '24 hours' ";
 
@@ -170,15 +171,16 @@ public class QueryHelper {
         // Iterate over the past 7 days
         for (int i = 0; i < days; i++) {
             // Subtract i days from the current date
-            String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now().minusDays(i), ZoneId.of("Asia/Singapore"));
+            LocalDateTime sgNow = DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now(), ZoneId.of("Asia/Singapore"));
+            String sgNowStr = DateTimeUtil.getZonedDateTimeStr(now().minusDays(i), ZoneId.of("Asia/Singapore"));
 
             // Append the SQL statement for each day to the query builder
-            queryBuilder.append("SELECT COUNT(DISTINCT meter_sn) FROM ")
+            queryBuilder.append("SELECT '").append(sgNow.toLocalDate()).append("' AS date, COUNT(DISTINCT meter_sn) FROM ")
                     .append(tableName)
                     .append(" WHERE ")
                     .append(timekey)
                     .append(" > TIMESTAMP '")
-                    .append(sgNow)
+                    .append(sgNowStr)
                     .append("' - INTERVAL '24 hours'");
 
             // Add a UNION ALL between each statement except the last one
@@ -204,7 +206,7 @@ public class QueryHelper {
     public double getActiveKwhConsumption(String meterSnStr){
         List<Map<String, Object>> kwhConsumption = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
                 " where meter_sn = '" + meterSnStr + "' " +
                 " and kwh_diff is not null " +
@@ -229,7 +231,7 @@ public class QueryHelper {
     public double getAllActiveKwhConsumption(){
         List<Map<String, Object>> kwhConsumption = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
                 " where kwh_diff is not null " +
                 " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
@@ -251,7 +253,7 @@ public class QueryHelper {
     public double getAllTopupAmount(){
         List<Map<String, Object>>topupTotal = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
 //        String sql = "select sum(credit_amt) as credit_total from meter_tariff " +
 //                " where credit_amt is not null " +
 //                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
@@ -283,7 +285,7 @@ public class QueryHelper {
 
         List<Map<String, Object>> meterSns = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String sql = "select distinct meter_sn from " + tableName;
 
         try {
@@ -484,7 +486,7 @@ public class QueryHelper {
         String meterKivTable = "meter_kiv";
 
         if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
-            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
         }
         if(sessionId == null || sessionId.isEmpty()) {
             sessionId = UUID.randomUUID().toString();
@@ -554,7 +556,7 @@ public class QueryHelper {
         String meterKivTable = "meter_kiv";
 
         if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
-            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
         }
         if(sessionId == null || sessionId.isEmpty()) {
             sessionId = UUID.randomUUID().toString();
@@ -626,7 +628,7 @@ public class QueryHelper {
         String meterKivTable = "meter_kiv";
 
         if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
-            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
         }
         if(sessionId == null || sessionId.isEmpty()) {
             sessionId = UUID.randomUUID().toString();
@@ -740,7 +742,7 @@ public class QueryHelper {
     public Map<String, Object> getRecentMeterKiv(){
         List<Map<String, Object>>meterKiv = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String sql = "select * from meter_kiv " +
                 " where kiv_tag != 'missing_ref_bal_epoch' " +
                 " and kiv_tag != 'reading_interval' " +
@@ -766,7 +768,7 @@ public class QueryHelper {
         String opsLogTable = "evs2_op_log";
 
         if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
-            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(LocalDateTime.now(), ZoneId.of("Asia/Singapore"));;
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
         }
         if(sessionId == null || sessionId.isEmpty()) {
             sessionId = UUID.randomUUID().toString();
