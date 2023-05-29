@@ -158,6 +158,7 @@ public class QueryHelper {
         String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
                 " where meter_sn = '" + meterSnStr + "' " +
                 " and kwh_diff is not null " +
+                " and kwh_diff > 0 " +
                 " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
