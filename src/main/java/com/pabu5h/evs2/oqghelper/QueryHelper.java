@@ -346,6 +346,60 @@ public class QueryHelper {
         return Double.parseDouble(topupTotal.get(0).get("topup_total").toString());
     }
 
+    public Map<String, Object> getTotalTopupHistory(int days){
+
+        String tableName = "transaction_log";
+        String timeKey = "response_timestamp";
+        // Create a StringBuilder to build the SQL query
+        StringBuilder queryBuilder = new StringBuilder();
+
+        // Iterate over the past n days
+        for (int i = 0; i < days; i++) {
+            // Subtract i days from the current date
+            LocalDateTime sgNow =
+                    DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now().minusDays(i), ZoneId.of("Asia/Singapore"));
+            String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
+
+            // Append the SQL statement for each day to the query builder
+            queryBuilder.append("SELECT '")
+                    .append(sgNowStr)
+                    .append("' AS timestamp, sum(topup_amt) as topup_total FROM ")
+                    .append(tableName)
+                    .append(" WHERE ")
+                    .append(timeKey)
+                    .append(" > TIMESTAMP '")
+                    .append(sgNowStr)
+                    .append("' - INTERVAL '24 hours'")
+                    .append(" AND ")
+                    .append(timeKey)
+                    .append(" <= TIMESTAMP '")
+                    .append(sgNowStr)
+                    .append("'");
+
+            // Add a UNION ALL between each statement except the last one
+            if (i < days - 1) {
+                queryBuilder.append(" UNION ALL ");
+            }
+        }
+
+        // Store the final SQL query string
+        String sql = queryBuilder.toString();
+        List<Map<String, Object>> totalTopup = new ArrayList<>();
+        try {
+            totalTopup = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(totalTopup.size() == 0){
+            return Collections.singletonMap("info", "no data");
+        }
+        //sort by date in descending order
+        totalTopup.sort(Comparator.comparing(m -> m.get("timestamp").toString()));
+        Collections.reverse(totalTopup);
+
+        return Collections.singletonMap("total_topup_history", totalTopup);
+    }
+
     public List<String> getAllMeterSns(String tableName){
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
