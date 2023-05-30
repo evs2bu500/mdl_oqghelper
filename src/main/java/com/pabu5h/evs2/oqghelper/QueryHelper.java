@@ -317,7 +317,7 @@ public class QueryHelper {
         kwhConsumption.sort(Comparator.comparing(m -> m.get("timestamp").toString()));
         Collections.reverse(kwhConsumption);
 
-        return Collections.singletonMap("kwh_consumption_history", kwhConsumption);
+        return Collections.singletonMap("active_kwh_consumption_history", kwhConsumption);
     }
     public double getAllTopupAmount(){
         List<Map<String, Object>>topupTotal = new ArrayList<>();
