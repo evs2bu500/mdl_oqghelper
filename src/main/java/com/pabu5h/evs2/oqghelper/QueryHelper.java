@@ -346,7 +346,6 @@ public class QueryHelper {
         return Double.parseDouble(topupTotal.get(0).get("topup_total").toString());
     }
 
-
     public List<String> getAllMeterSns(String tableName){
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
