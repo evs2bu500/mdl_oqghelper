@@ -265,6 +265,60 @@ public class QueryHelper {
         }
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
     }
+
+    public Map<String, Object> getAllActiveKwhConsumptionHistory(int days){
+
+        String tableName = "meter_tariff";
+        String timeKey = "tariff_timestamp";
+        // Create a StringBuilder to build the SQL query
+        StringBuilder queryBuilder = new StringBuilder();
+
+        // Iterate over the past 7 days
+        for (int i = 0; i < days; i++) {
+            // Subtract i days from the current date
+            LocalDateTime sgNow =
+                    DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now().minusDays(i), ZoneId.of("Asia/Singapore"));
+            String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
+
+            // Append the SQL statement for each day to the query builder
+            queryBuilder.append("SELECT '")
+                    .append(sgNowStr)
+                    .append("' AS timestamp, sum(kwh_diff) as kwh_total FROM ")
+                    .append(tableName)
+                    .append(" WHERE ")
+                    .append(timeKey)
+                    .append(" > TIMESTAMP '")
+                    .append(sgNowStr)
+                    .append("' - INTERVAL '24 hours'")
+                    .append(" AND ")
+                    .append(timeKey)
+                    .append(" <= TIMESTAMP '")
+                    .append(sgNowStr)
+                    .append("'");
+
+            // Add a UNION ALL between each statement except the last one
+            if (i < days - 1) {
+                queryBuilder.append(" UNION ALL ");
+            }
+        }
+
+        // Store the final SQL query string
+        String sql = queryBuilder.toString();
+        List<Map<String, Object>> kwhConsumption = new ArrayList<>();
+        try {
+            kwhConsumption = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(kwhConsumption.size() == 0){
+            return Collections.singletonMap("info", "no data");
+        }
+        //sort by date in descending order
+        kwhConsumption.sort(Comparator.comparing(m -> m.get("timestamp").toString()));
+        Collections.reverse(kwhConsumption);
+
+        return Collections.singletonMap("kwh_consumption_history", kwhConsumption);
+    }
     public double getAllTopupAmount(){
         List<Map<String, Object>>topupTotal = new ArrayList<>();
 
