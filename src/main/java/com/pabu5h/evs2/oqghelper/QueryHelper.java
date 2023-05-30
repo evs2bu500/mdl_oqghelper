@@ -369,6 +369,7 @@ public class QueryHelper {
                     .append(" topup_amt is not null ")
                     .append(" and transaction_status = 3 ")
                     .append(" and payment_mode != 4 ")
+                    .append(" and ")
                     .append(timeKey)
                     .append(" > TIMESTAMP '")
                     .append(sgNowStr)
