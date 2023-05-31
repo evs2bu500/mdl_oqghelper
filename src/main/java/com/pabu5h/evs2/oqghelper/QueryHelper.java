@@ -853,10 +853,30 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
-    public void updateMeterMeterMmsAddress(String meterSnStr, String mmsAddress){
+    public void updateMeterMeterMmsFullAddress(String meterSnStr, String mmsAddress){
         //add escape character for single quote
         mmsAddress = mmsAddress.replace("'", "''");
         String sql = "update meter set mms_address = '" + mmsAddress +
+                "' where meter_sn = '" + meterSnStr + "'" ;
+        try {
+            oqgHelper.OqgIU(sql);
+        } catch (Exception e) {
+            logger.error("Error updating meter mms address for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+    }
+    public void updateMeterMeterMmsAddress(String meterSnStr, Map<String, String> mmsAddressDetail){
+        String mmsAddress = mmsAddressDetail.get("mms_address");
+        String mssBlk = mmsAddressDetail.get("mms_block");
+        String mmsBuilding = mmsAddressDetail.get("mms_building");
+        //add escape character for single quote
+        mmsAddress = mmsAddress.replace("'", "''");
+        mssBlk = mssBlk.replace("'", "''");
+        mmsBuilding = mmsBuilding.replace("'", "''");
+        String sql = "update meter set " +
+                " mms_address = '" + mmsAddress +
+                "', mms_block = '" + mssBlk +
+                "', mms_building = '" + mmsBuilding +
                 "' where meter_sn = '" + meterSnStr + "'" ;
         try {
             oqgHelper.OqgIU(sql);
