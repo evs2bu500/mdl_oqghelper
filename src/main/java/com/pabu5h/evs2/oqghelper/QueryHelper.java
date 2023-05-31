@@ -429,7 +429,7 @@ public class QueryHelper {
 //        totalTopup.sort(Comparator.comparing(m -> m.get("timestamp").toString()));
 //        Collections.reverse(totalTopup);
 
-        return Collections.singletonMap("total_consumptions", totalConsumptions);
+        return Collections.singletonMap("recent_kwh_consumptions", totalConsumptions);
     }
 
     public List<String> getAllMeterSns(String tableName){
