@@ -404,6 +404,34 @@ public class QueryHelper {
         return Collections.singletonMap("total_topup_history", totalTopup);
     }
 
+    public Map<String, Object> getTotalConsumptions(int days){
+
+        String tableName = "meter_tariff";
+        String timeKey = "tariff_timestamp";
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+        int hours = days * 24;
+        // Create a StringBuilder to build the SQL query
+        String sql = "select sum(kwh_diff) as kwh_total, meter_sn, from + " + tableName +
+                " where kwh_diff is not null " +
+                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '" + hours+ " hours' " +
+                " group by meter_sn";
+
+        List<Map<String, Object>> totalConsumptions = new ArrayList<>();
+        try {
+            totalConsumptions = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(totalConsumptions.size() == 0){
+            return Collections.singletonMap("info", "no data");
+        }
+//        //sort by date in descending order
+//        totalTopup.sort(Comparator.comparing(m -> m.get("timestamp").toString()));
+//        Collections.reverse(totalTopup);
+
+        return Collections.singletonMap("total_consumptions", totalConsumptions);
+    }
+
     public List<String> getAllMeterSns(String tableName){
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
