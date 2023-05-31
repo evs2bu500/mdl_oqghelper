@@ -411,7 +411,7 @@ public class QueryHelper {
         String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         int hours = days * 24;
         // Create a StringBuilder to build the SQL query
-        String sql = "select sum(kwh_diff) as kwh_total, meter_sn, from + " + tableName +
+        String sql = "select sum(kwh_diff) as kwh_total, meter_sn from " + tableName +
                 " where kwh_diff is not null " +
                 " and tariff_timestamp > timestamp '" + sgNow + "' - interval '" + hours+ " hours' " +
                 " group by meter_sn";
