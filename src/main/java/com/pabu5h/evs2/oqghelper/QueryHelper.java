@@ -404,7 +404,7 @@ public class QueryHelper {
         return Collections.singletonMap("total_topup_history", totalTopup);
     }
 
-    public Map<String, Object> getTotalConsumptions(int days){
+    public Map<String, Object> getRecentKwhConsumptions(int days){
 
         String tableName = "meter_tariff";
         String timeKey = "tariff_timestamp";
