@@ -895,15 +895,15 @@ public class QueryHelper {
     }
     public void updateMeterMeterMmsAddress(String meterSnStr, Map<String, String> mmsAddressDetail){
         String mmsAddress = mmsAddressDetail.get("mms_address");
-        String mssBlk = mmsAddressDetail.get("mms_block");
+        String mmsBlk = mmsAddressDetail.get("mms_block");
         String mmsBuilding = mmsAddressDetail.get("mms_building");
         //add escape character for single quote
         mmsAddress = mmsAddress.replace("'", "''");
-        mssBlk = mssBlk.replace("'", "''");
+        mmsBlk = mmsBlk == null? null: mmsBlk.replace("'", "''");
         mmsBuilding = mmsBuilding.replace("'", "''");
         String sql = "update meter set " +
                 " mms_address = '" + mmsAddress +
-                "', mms_block = '" + mssBlk +
+                "', mms_block = '" + mmsBlk +
                 "', mms_building = '" + mmsBuilding +
                 "' where meter_sn = '" + meterSnStr + "'" ;
         try {
