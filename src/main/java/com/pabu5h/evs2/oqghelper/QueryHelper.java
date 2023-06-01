@@ -900,7 +900,7 @@ public class QueryHelper {
         //add escape character for single quote
         mmsAddress = mmsAddress.replace("'", "''");
         mmsBlk = mmsBlk == null? null: mmsBlk.replace("'", "''");
-        mmsBuilding = mmsBuilding.replace("'", "''");
+        mmsBuilding = mmsBuilding == null? null: mmsBuilding.replace("'", "''");
         String sql = "update meter set " +
                 " mms_address = '" + mmsAddress +
                 "', mms_block = '" + mmsBlk +
