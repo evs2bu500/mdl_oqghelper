@@ -919,6 +919,26 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
+
+    public void updateMeterTataInfo(Map<String, String> tataInfo) {
+        String iccId = tataInfo.get("icc_id");
+        String subId = tataInfo.get("sub_id");
+        if(iccId==null || subId==null){
+            logger.error("null tata info for esim_id: " + iccId);
+            return;
+        }
+        //sql to update iccId where esim_id contains iccId
+        String sql = "update meter set " +
+                " data_subscription_id = '" + subId +
+                "' where esim_id like '%" + iccId + "%'" ;
+        try {
+            oqgHelper.OqgIU(sql);
+        } catch (Exception e) {
+            logger.error("Error updating meter tata info for esim_id: " + iccId);
+            throw new RuntimeException(e);
+        }
+    }
+
     public Map<String, Object> getRecentMeterKiv(){
         List<Map<String, Object>>meterKiv = new ArrayList<>();
 
