@@ -893,10 +893,11 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
-    public void updateMeterMeterMmsAddress(String meterSnStr, Map<String, String> mmsAddressDetail){
-        String mmsAddress = mmsAddressDetail.get("mms_address");
-        String mmsBlk = mmsAddressDetail.get("mms_block");
-        String mmsBuilding = mmsAddressDetail.get("mms_building");
+    public void updateMeterMeterMmsInfo(String meterSnStr, Map<String, String> mmsInfo){
+        String mmsAddress = mmsInfo.get("mms_address");
+        String mmsBlk = mmsInfo.get("mms_block");
+        String mmsBuilding = mmsInfo.get("mms_building");
+        String eSimId = mmsInfo.get("esim_id");
 //        if(mmsAddress==null && mmsBlk==null && mmsBuilding==null){
 //            return;
 //        }
@@ -904,15 +905,17 @@ public class QueryHelper {
         mmsAddress = mmsAddress.replace("'", "''");
         mmsBlk = mmsBlk == null? "": mmsBlk.replace("'", "''");
         mmsBuilding = mmsBuilding == null? "": mmsBuilding.replace("'", "''");
+        eSimId = eSimId == null? "": eSimId;
         String sql = "update meter set " +
                 " mms_address = '" + mmsAddress +
                 "', mms_block = '" + mmsBlk +
                 "', mms_building = '" + mmsBuilding +
+                "', esim_id = '" + eSimId +
                 "' where meter_sn = '" + meterSnStr + "'" ;
         try {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
-            logger.error("Error updating meter mms address for meterSn: " + meterSnStr);
+            logger.error("Error updating meter mms info for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
     }
