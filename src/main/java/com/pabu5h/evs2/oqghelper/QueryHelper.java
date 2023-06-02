@@ -126,6 +126,19 @@ public class QueryHelper {
         return meterInfo;
     }
 
+    public void insertMeterDataBal(String meterSn, String dataBal){
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+        String tableName = "meter_comm_data";
+
+        String sql = "insert into " + tableName + " (meter_sn, data_bal, data_bal_timestamp) " +
+                "values ('" + meterSn + "', " + dataBal + ", timestamp '" + sgNow + "')";
+        try {
+            oqgHelper.OqgIU(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public long getActiveMeterCount(String tableName){
         String timekey = "kwh_timestamp";
         if(tableName ==null || tableName.isEmpty()){
