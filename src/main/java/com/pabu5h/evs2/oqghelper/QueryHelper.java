@@ -113,8 +113,10 @@ public class QueryHelper {
         return meterInfo;
     }
     public List<Map<String, Object>> getAllMeterInfo2(){
-        String sql = "select meter_sn, meter_displayname, reading_interval, commission_timestamp, mms_address, mms_block, mms_building "
-                + " from meter";
+        String sql = "select meter_sn, meter_displayname, reading_interval, commission_timestamp, " +
+                " mms_address, mms_block, mms_building, " +
+                " esim_id, data_subscription_id " +
+                " from meter";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR(sql);
