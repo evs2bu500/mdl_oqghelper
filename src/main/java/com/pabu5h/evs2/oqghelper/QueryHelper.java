@@ -897,6 +897,9 @@ public class QueryHelper {
         String mmsAddress = mmsAddressDetail.get("mms_address");
         String mmsBlk = mmsAddressDetail.get("mms_block");
         String mmsBuilding = mmsAddressDetail.get("mms_building");
+        if(mmsAddress==null && mmsBlk==null && mmsBuilding==null){
+            return;
+        }
         //add escape character for single quote
         mmsAddress = mmsAddress.replace("'", "''");
         mmsBlk = mmsBlk == null? null: mmsBlk.replace("'", "''");
