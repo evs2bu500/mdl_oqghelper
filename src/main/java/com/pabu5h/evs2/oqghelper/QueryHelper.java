@@ -902,8 +902,8 @@ public class QueryHelper {
 //        }
         //add escape character for single quote
         mmsAddress = mmsAddress.replace("'", "''");
-        mmsBlk = mmsBlk == null? null: mmsBlk.replace("'", "''");
-        mmsBuilding = mmsBuilding == null? null: mmsBuilding.replace("'", "''");
+        mmsBlk = mmsBlk == null? "": mmsBlk.replace("'", "''");
+        mmsBuilding = mmsBuilding == null? "": mmsBuilding.replace("'", "''");
         String sql = "update meter set " +
                 " mms_address = '" + mmsAddress +
                 "', mms_block = '" + mmsBlk +
