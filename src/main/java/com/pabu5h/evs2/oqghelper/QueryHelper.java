@@ -130,7 +130,7 @@ public class QueryHelper {
         String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String tableName = "meter_comm_data";
 
-        String sql = "insert into " + tableName + " (meter_sn, data_bal, data_bal_ini, timestamp) " +
+        String sql = "insert into " + tableName + " (meter_sn, data_bal, data_bal_ini, data_bal_timestamp) " +
                 "values ('" + meterSn + "', " + dataBal + ", " + initBal + ", timestamp '" + sgNow + "')";
         try {
             oqgHelper.OqgIU(sql);
