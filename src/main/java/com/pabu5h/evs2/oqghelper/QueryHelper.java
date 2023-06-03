@@ -138,6 +138,20 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
+    public Map<String, Object> getMeterDataBal(String meterSnStr){
+        String tableName = "meter_comm_data";
+        String sql = "select * from " + tableName + " where meter_sn = '" + meterSnStr + "' order by data_bal_timestamp desc limit 1";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "meter not found");
+        }
+        return meterInfo.get(0);
+    }
 
     public long getActiveMeterCount(String tableName){
         String timekey = "kwh_timestamp";
@@ -279,6 +293,30 @@ public class QueryHelper {
             return 0;
         }
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
+    }
+
+    public double getAllRecentCommData(){
+        String tableName = "meter_comm_data";
+        List<Map<String, Object>> dataConsumption = new ArrayList<>();
+
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select sum(data_bal_diff) as data_total from " + tableName +
+                " where data_bal_diff is not null " +
+                " and data_bal_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+
+        try {
+            dataConsumption = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(dataConsumption.size() == 0){
+            return 0;
+        }
+        //sum() will always return a value, even if there is no data, the list will still have 1 element
+        if(dataConsumption.get(0).get("data_total") == null){
+            return 0;
+        }
+        return Double.parseDouble(dataConsumption.get(0).get("data_total").toString());
     }
 
     public Map<String, Object> getAllActiveKwhConsumptionHistory(int days){
