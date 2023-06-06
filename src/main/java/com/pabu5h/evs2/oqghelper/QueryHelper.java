@@ -948,6 +948,7 @@ public class QueryHelper {
     }
     public void updateMeterMeterMmsInfo(String meterSnStr, Map<String, String> mmsInfo){
         String mmsAddress = mmsInfo.get("mms_address");
+        String mmsLevel = mmsInfo.get("mms_level");
         String mmsBlk = mmsInfo.get("mms_block");
         String mmsBuilding = mmsInfo.get("mms_building");
         String eSimId = mmsInfo.get("esim_id");
@@ -957,10 +958,12 @@ public class QueryHelper {
         //add escape character for single quote
         mmsAddress = mmsAddress.replace("'", "''");
         mmsBlk = mmsBlk == null? "": mmsBlk.replace("'", "''");
+        mmsLevel = mmsLevel == null? "": mmsLevel.replace("'", "''");
         mmsBuilding = mmsBuilding == null? "": mmsBuilding.replace("'", "''");
         eSimId = eSimId == null? "": eSimId;
         String sql = "update meter set " +
                 " mms_address = '" + mmsAddress +
+                "', mms_level = '" + mmsLevel +
                 "', mms_block = '" + mmsBlk +
                 "', mms_building = '" + mmsBuilding +
                 "', esim_id = '" + eSimId +
