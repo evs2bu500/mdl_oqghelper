@@ -1005,8 +1005,8 @@ public class QueryHelper {
         if(premises.isEmpty()) {
             String ins = "insert into premise " +
                     "(id, street, building, block, level, unit, postal_code, premise_type_id, scope) " +
-                    "values (" + "(select max(id)+1 as available_id from premise)" + "'," +
-                    " " + street + "'," +
+                    "values (" + "(select max(id)+1 as available_id from premise)" + "," +
+                    "'" + street + "'," +
                     "'" + building + "'," +
                     "'" + block + "'," +
                     "'" + level + "'," +
