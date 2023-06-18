@@ -973,6 +973,53 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
+    public void updateMmsPremise(Map<String, String> mmsAddressInfo){
+        String unit = mmsAddressInfo.get("mms_unit");
+        String level = mmsAddressInfo.get("mms_level");
+        String block = mmsAddressInfo.get("mms_block");
+        String building = mmsAddressInfo.get("mms_building");
+        String street = mmsAddressInfo.get("mms_street");
+        String postalCode = mmsAddressInfo.get("mms_postal_code");
+
+        //add escape character for single quote
+        unit = unit == null? "": unit.replace("'", "''");
+        block = block == null? "": block.replace("'", "''");
+        level = level == null? "": level.replace("'", "''");
+        building = building == null? "": building.replace("'", "''");
+        street = street == null? "": street.replace("'", "''");
+
+        String sel = "select id from premise where " +
+                " street = '" + street + "' and" +
+                " building = '" + building + "' and" +
+                " block = '" + block + "' and" +
+                " level = '" + level + "' and" +
+                " unit = '" + unit + "' and" +
+                " postal_code = '" + postalCode + "'";
+        List<Map<String, Object>> premises = new ArrayList<>();
+        try {
+            premises = oqgHelper.OqgR(sel);
+        } catch (Exception e) {
+            logger.error("Error getting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
+            throw new RuntimeException(e);
+        }
+        if(premises.isEmpty()) {
+            String ins = "insert into premise (street, building, block, level, unit, postal_code, scope) values (" +
+                    "'" + street + "'," +
+                    "'" + building + "'," +
+                    "'" + block + "'," +
+                    "'" + level + "'," +
+                    "'" + unit + "'," +
+                    "'" + postalCode + "'," +
+                    " 'mms'" +
+                    ")";
+            try {
+                oqgHelper.OqgIU(ins);
+            } catch (Exception e) {
+                logger.error("Error inserting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
+                throw new RuntimeException(e);
+            }
+        }
+    }
     public Map<String, Object> getMeterSnInBuilding(String building, String block){
 
         String mmsBlk = block == null? "": block.replace("'", "''");
