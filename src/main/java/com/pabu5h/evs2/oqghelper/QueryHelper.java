@@ -1003,8 +1003,14 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
         if(premises.isEmpty()) {
+
+            String buildingId =
+                    block.trim().toLowerCase() + "-" +
+                    building.trim().replace(" ", "-").replace("'", "-").toLowerCase() + "-" +
+                    postalCode.trim().toLowerCase();
+
             String ins = "insert into premise " +
-                    "(id, street, building, block, level, unit, postal_code, premise_type_id, scope) " +
+                    "(id, street, building, block, level, unit, postal_code, premise_type_id, building_identifier, scope) " +
                     "values (" + "(select max(id)+1 as available_id from premise)" + "," +
                     "'" + street + "'," +
                     "'" + building + "'," +
@@ -1013,6 +1019,7 @@ public class QueryHelper {
                     "'" + unit + "'," +
                     "'" + postalCode + "'," +
                     " 23, " +
+                    "'" + buildingId + "'," +
                     " 'mms'" +
                     ")";
             try {
@@ -1022,6 +1029,17 @@ public class QueryHelper {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public Map<String, Object> getScopeBuildings(String scope){
+        String sql = "SELECT DISTINCT mms_building FROM premise WHERE scope = '" + scope + "'";
+        List<Map<String, Object>> buildings = new ArrayList<>();
+        try {
+            buildings = oqgHelper.OqgR(sql);
+        }catch (Exception e){
+            logger.info("oqgHelper error: "+e.getMessage());
+        }
+        return Map.of("buildings", buildings);
     }
     public Map<String, Object> getMeterSnInBuilding(String building, String block){
 
