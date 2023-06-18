@@ -21,10 +21,8 @@ import static java.util.Collections.singletonMap;
 
 @Service
 public class QueryHelper {
-
     @Autowired
     private OqgHelper oqgHelper;
-
     private final Logger logger;
 
     public QueryHelper(Logger logger) {
@@ -975,7 +973,21 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
+    public Map<String, Object> getMeterSnInBuilding(String building, String block){
 
+        String mmsBlk = block == null? "": block.replace("'", "''");
+        String mmsBuilding = building == null? "": building.replace("'", "''");
+
+        String sql = "SELECT meter_sn, meter_displayname FROM meter WHERE " +
+                " mms_building = '" + mmsBuilding + "' AND mms_block = '" + mmsBlk + "'";
+        List<Map<String, Object>> meters = new ArrayList<>();
+        try {
+            meters = oqgHelper.OqgR(sql);
+        }catch (Exception e){
+            logger.info("oqgHelper error: "+e.getMessage());
+        }
+        return Map.of("meters", meters);
+    }
     public void updateMeterTataInfo(Map<String, String> tataInfo) {
         String iccId = tataInfo.get("icc_id");
         String subId = tataInfo.get("sub_id");
