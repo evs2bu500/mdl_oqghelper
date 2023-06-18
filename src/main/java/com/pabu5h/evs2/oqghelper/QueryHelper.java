@@ -1003,13 +1003,16 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
         if(premises.isEmpty()) {
-            String ins = "insert into premise (street, building, block, level, unit, postal_code, scope) values (" +
+            String ins = "insert into premise " +
+                    "(street, building, block, level, unit, postal_code, premise_type_id, scope) " +
+                    "values (" +
                     "'" + street + "'," +
                     "'" + building + "'," +
                     "'" + block + "'," +
                     "'" + level + "'," +
                     "'" + unit + "'," +
                     "'" + postalCode + "'," +
+                    " 23, " +
                     " 'mms'" +
                     ")";
             try {
