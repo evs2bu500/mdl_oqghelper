@@ -1032,12 +1032,13 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getScopeBuildings(String scope){
-        String sql = "SELECT DISTINCT mms_building FROM premise WHERE scope = '" + scope + "'";
+        String sql = "SELECT DISTINCT building_identifier FROM premise WHERE scope = '" + scope + "'";
         List<Map<String, Object>> buildings = new ArrayList<>();
         try {
             buildings = oqgHelper.OqgR(sql);
         }catch (Exception e){
             logger.info("oqgHelper error: "+e.getMessage());
+            return Map.of("error", e.getMessage());
         }
         return Map.of("buildings", buildings);
     }
