@@ -569,7 +569,7 @@ public class QueryHelper {
             tableName = "meter_tariff";
         }
         String sqlMeterCredit = "select ref_bal from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
-                " and ref_bal is not null order by id desc limit 1";
+                " and ref_bal is not null order by tariff_timestamp desc limit 1";
         List<Map<String, Object>> meterCredit = new ArrayList<>();
         try {
             meterCredit = oqgHelper.OqgR(sqlMeterCredit);
