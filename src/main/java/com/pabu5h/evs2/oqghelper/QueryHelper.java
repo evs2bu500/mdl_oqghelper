@@ -552,6 +552,22 @@ public class QueryHelper {
         return (meterSn.get(0).get("meter_sn") == null ? "" : meterSn.get(0).get("meter_sn").toString());
     }
 
+    public String getMeterDisplaynameFromSn(String meterSn) {
+        String sqlMeterSn = "select meter_displayname from meter where meter_sn = '" + meterSn + "'";
+        List<Map<String, Object>> meterSnList = new ArrayList<>();
+        try {
+            meterSnList = oqgHelper.OqgR(sqlMeterSn);
+        } catch (Exception e) {
+            logger.error("Error getting meter_displayname for meter_sn: " + meterSn);
+            throw new RuntimeException(e);
+        }
+        if (meterSnList.isEmpty()) {
+            logger.info("meter_displayname is empty for meter_sn: " + meterSn);
+            return "";
+        }
+        return (meterSnList.get(0).get("meter_displayname") == null ? "" : meterSnList.get(0).get("meter_displayname").toString());
+    }
+
     public ResponseEntity<Map<String, Object>> getMeterSnFromDisplayName(Map<String, String> reqMeterDisplayName){
         if(!reqMeterDisplayName.containsKey("meter_displayname")){
             return ResponseEntity.badRequest()
