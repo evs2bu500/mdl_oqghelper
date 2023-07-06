@@ -124,6 +124,21 @@ public class QueryHelper {
         return meterInfo;
     }
 
+    public List<Map<String, Object>> getAllMmsMeterInfo(){
+        String sql = "select meter_sn, meter_displayname, reading_interval, concentrator_id, commission_timestamp, " +
+                " mms_address, mms_level, mms_block, mms_building, " +
+                " esim_id, data_subscription_id " +
+                " from meter " +
+                " where esim_id is not null and esim_id != '' ";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return meterInfo;
+    }
+
     public void insertMeterDataBal(String meterSn, String dataBal, String initBal){
         String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String tableName = "meter_comm_data";
