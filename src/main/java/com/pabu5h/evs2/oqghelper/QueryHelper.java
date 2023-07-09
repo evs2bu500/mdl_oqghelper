@@ -98,8 +98,12 @@ public class QueryHelper {
         return meterInfo.get(0);
     }
 
-    public Map<String, Object> getMmsBuildings(){
+    public Map<String, Object> getMmsBuildings(String projectScope){
         String sql = "select mms_building from meter";
+        if(projectScope != null && !projectScope.isEmpty()){
+            sql = "select mms_building from meter where scope_str LIKE '%" + projectScope + "%'";
+        }
+
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR(sql);
@@ -112,8 +116,11 @@ public class QueryHelper {
         return Map.of("buildings", meterInfo.stream().map(meter -> meter.get("mms_building")).toList());
     }
 
-    public Map<String, Object> getMmsBuildingBlocks (String building){
+    public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope){
         String sql = "select mms_block from meter where mms_building = '" + building + "'";
+        if(projectScope != null && !projectScope.isEmpty()){
+            sql = "select mms_block from meter where mms_building = '" + building + "' and scope_str LIKE '%" + projectScope + "%'";
+        }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR(sql);
@@ -126,8 +133,11 @@ public class QueryHelper {
         return Map.of("blocks", meterInfo.stream().map(meter -> meter.get("mms_block")).toList());
     }
 
-    public Map<String, Object> getMmsLevels (String building, String block){
+    public Map<String, Object> getMmsLevels (String building, String block, String projectScope){
         String sql = "select mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'";
+        if(projectScope != null && !projectScope.isEmpty()){
+            sql = "select mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and scope_str LIKE '%" + projectScope + "%'";
+        }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR(sql);
