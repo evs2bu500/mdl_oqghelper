@@ -97,6 +97,49 @@ public class QueryHelper {
         }
         return meterInfo.get(0);
     }
+
+    public Map<String, Object> getMmsBuildings(){
+        String sql = "select mms_building from meter";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "building not found");
+        }
+        return Map.of("buildings", meterInfo.stream().map(meter -> meter.get("mms_building")).toList());
+    }
+
+    public Map<String, Object> getMmsBuildingBlocks (String building){
+        String sql = "select mms_block from meter where mms_building = '" + building + "'";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "block not found");
+        }
+        return Map.of("blocks", meterInfo.stream().map(meter -> meter.get("mms_block")).toList());
+    }
+
+    public Map<String, Object> getMmsLevels (String building, String block){
+        String sql = "select mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "level not found");
+        }
+        return Map.of("levels", meterInfo.stream().map(meter -> meter.get("mms_level")).toList());
+    }
+
     public List<Map<String, Object>> getAllMeterInfo(){
         String sql = "select meter_sn, meter_displayname, reading_interval, commission_timestamp" +
                 " unit, street, block, building" +
