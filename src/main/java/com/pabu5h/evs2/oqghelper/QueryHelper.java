@@ -1122,7 +1122,7 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getScopeBuildings(String scope){
-        String sql = "SELECT DISTINCT building_identifier, building, block, postal_code FROM premise WHERE scope Like '%" + scope + "%'";
+        String sql = "SELECT DISTINCT building_identifier, building, block, postal_code FROM premise WHERE scope_str Like '%" + scope + "%'";
         List<Map<String, Object>> buildings = new ArrayList<>();
         try {
             buildings = oqgHelper.OqgR(sql);
