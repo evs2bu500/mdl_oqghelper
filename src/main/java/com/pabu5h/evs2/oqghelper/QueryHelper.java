@@ -113,7 +113,7 @@ public class QueryHelper {
         if(meterInfo.size() == 0){
             return Map.of("info", "building not found");
         }
-        return Map.of("buildings", meterInfo.stream().map(meter -> meter.get("mms_building")).toList());
+        return Map.of("building_list", meterInfo.stream().map(meter -> meter.get("mms_building")).toList());
     }
 
     public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope){
@@ -130,7 +130,7 @@ public class QueryHelper {
         if(meterInfo.size() == 0){
             return Map.of("info", "block not found");
         }
-        return Map.of("blocks", meterInfo.stream().map(meter -> meter.get("mms_block")).toList());
+        return Map.of("block_list", meterInfo.stream().map(meter -> meter.get("mms_block")).toList());
     }
 
     public Map<String, Object> getMmsLevels (String building, String block, String projectScope){
@@ -147,7 +147,7 @@ public class QueryHelper {
         if(meterInfo.size() == 0){
             return Map.of("info", "level not found");
         }
-        return Map.of("levels", meterInfo.stream().map(meter -> meter.get("mms_level")).toList());
+        return Map.of("level_list", meterInfo.stream().map(meter -> meter.get("mms_level")).toList());
     }
 
     public List<Map<String, Object>> getAllMeterInfo(){
