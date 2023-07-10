@@ -97,6 +97,19 @@ public class QueryHelper {
         }
         return meterInfo.get(0);
     }
+    public Map<String, Object> getMeterProperty(String meterSnStr, String property){
+        String sql = "select " + property + " from meter where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "meter not found");
+        }
+        return meterInfo.get(0);
+    }
 
     public Map<String, Object> getMmsBuildings(String projectScope){
         String sql = "select DISTINCT mms_building from meter";
