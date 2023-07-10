@@ -1034,6 +1034,7 @@ public class QueryHelper {
         String mmsBlk = mmsInfo.get("mms_block");
         String mmsBuilding = mmsInfo.get("mms_building");
         String eSimId = mmsInfo.get("esim_id");
+        String mmsOnlineTimestamp = mmsInfo.get("mms_online_timestamp");
 //        if(mmsAddress==null && mmsBlk==null && mmsBuilding==null){
 //            return;
 //        }
@@ -1048,8 +1049,12 @@ public class QueryHelper {
                 "', mms_level = '" + mmsLevel +
                 "', mms_block = '" + mmsBlk +
                 "', mms_building = '" + mmsBuilding +
-                "', esim_id = '" + eSimId +
-                "' where meter_sn = '" + meterSnStr + "'" ;
+                "', esim_id = '" + eSimId + "' ";
+        if(mmsOnlineTimestamp!=null){
+            sql += ", mms_online_timestamp = '" + mmsOnlineTimestamp + "' ";
+        }
+        sql += " where meter_sn = '" + meterSnStr + "'" ;
+
         try {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
