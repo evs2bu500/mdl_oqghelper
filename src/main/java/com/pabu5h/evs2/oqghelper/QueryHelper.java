@@ -1069,6 +1069,7 @@ public class QueryHelper {
         String building = mmsAddressInfo.get("mms_building");
         String street = mmsAddressInfo.get("mms_street");
         String postalCode = mmsAddressInfo.get("mms_postal_code");
+        String scopeStr = mmsAddressInfo.get("scope_str");
 
         //add escape character for single quote
         unit = unit == null? "": unit.replace("'", "''");
@@ -1078,11 +1079,11 @@ public class QueryHelper {
         street = street == null? "": street.replace("'", "''");
 
         String sel = "select id from premise where " +
-                " street = '" + street + "' and" +
-                " building = '" + building + "' and" +
-                " block = '" + block + "' and" +
-                " level = '" + level + "' and" +
-                " unit = '" + unit + "' and" +
+                " street = '" + street + "' and " +
+                " building = '" + building + "' and " +
+                " block = '" + block + "' and " +
+                " level = '" + level + "' and " +
+                " unit = '" + unit + "' and " +
                 " postal_code = '" + postalCode + "'";
         List<Map<String, Object>> premises = new ArrayList<>();
         try {
@@ -1099,7 +1100,7 @@ public class QueryHelper {
                     postalCode.trim().toLowerCase();
 
             String ins = "insert into premise " +
-                    "(id, street, building, block, level, unit, postal_code, premise_type_id, building_identifier, scope) " +
+                    "(id, street, building, block, level, unit, postal_code, premise_type_id, building_identifier, scope_str) " +
                     "values (" + "(select max(id)+1 as available_id from premise)" + "," +
                     "'" + street + "'," +
                     "'" + building + "'," +
@@ -1109,7 +1110,7 @@ public class QueryHelper {
                     "'" + postalCode + "'," +
                     " 23, " +
                     "'" + buildingId + "'," +
-                    " 'mms'" +
+                    "'" + scopeStr + "'" +
                     ")";
             try {
                 oqgHelper.OqgIU(ins);
