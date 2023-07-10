@@ -1105,13 +1105,12 @@ public class QueryHelper {
             logger.error("Error getting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
             throw new RuntimeException(e);
         }
+
+        String buildingId =
+                block.trim().toLowerCase() + "-" +
+                        building.trim().replace(" ", "-").replace("'", "-").toLowerCase() + "-" +
+                        postalCode.trim().toLowerCase();
         if(premises.isEmpty()) {
-
-            String buildingId =
-                    block.trim().toLowerCase() + "-" +
-                    building.trim().replace(" ", "-").replace("'", "-").toLowerCase() + "-" +
-                    postalCode.trim().toLowerCase();
-
             String ins = "insert into premise " +
                     "(id, street, building, block, level, unit, postal_code, premise_type_id, building_identifier, scope_str) " +
                     "values (" + "(select max(id)+1 as available_id from premise)" + "," +
@@ -1129,6 +1128,23 @@ public class QueryHelper {
                 oqgHelper.OqgIU(ins);
             } catch (Exception e) {
                 logger.error("Error inserting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
+                throw new RuntimeException(e);
+            }
+        }else if(premises.size()==1) {
+            String upd = "update premise set " +
+                    " street = '" + street + "'," +
+                    " building = '" + building + "'," +
+                    " block = '" + block + "'," +
+                    " level = '" + level + "'," +
+                    " unit = '" + unit + "'," +
+                    " postal_code = '" + postalCode + "'," +
+                    " building_identifier = '" + buildingId + "'," +
+                    " scope_str = '" + scopeStr + "'" +
+                    " where id = " + premises.get(0).get("id");
+            try {
+                oqgHelper.OqgIU(upd);
+            } catch (Exception e) {
+                logger.error("Error updating premise for address info: " + building + " " + block + " " + level + " " + postalCode);
                 throw new RuntimeException(e);
             }
         }
