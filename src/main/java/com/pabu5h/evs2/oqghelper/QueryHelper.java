@@ -179,8 +179,8 @@ public class QueryHelper {
 
     public List<Map<String, Object>> getAllMmsMeterInfo(){
         String sql = "select meter_sn, meter_displayname, reading_interval, concentrator_id, commission_timestamp, " +
-                " mms_address, mms_level, mms_block, mms_building, " +
-                " esim_id, data_subscription_id " +
+                " mms_address, mms_level, mms_block, mms_building, mms_online_timestamp, " +
+                " esim_id, data_subscription_id, scope_str " +
                 " from meter " +
                 " where esim_id is not null and esim_id != '' ";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
@@ -1028,7 +1028,7 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
-    public void updateMeterMeterMmsInfo(String meterSnStr, Map<String, String> mmsInfo){
+    public void updateMeterMmsInfo(String meterSnStr, Map<String, String> mmsInfo){
         String mmsAddress = mmsInfo.get("mms_address");
         String mmsLevel = mmsInfo.get("mms_level");
         String mmsBlk = mmsInfo.get("mms_block");
@@ -1121,7 +1121,7 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getScopeBuildings(String scope){
-        String sql = "SELECT DISTINCT building_identifier, building, block, postal_code FROM premise WHERE scope = '" + scope + "'";
+        String sql = "SELECT DISTINCT building_identifier, building, block, postal_code FROM premise WHERE scope Like '%" + scope + "%'";
         List<Map<String, Object>> buildings = new ArrayList<>();
         try {
             buildings = oqgHelper.OqgR(sql);
