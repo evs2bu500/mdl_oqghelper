@@ -4,8 +4,7 @@ import com.pabu5h.evs2.dto.MeterInfoDto;
 import com.xt.utils.DateTimeUtil;
 import com.xt.utils.MathUtil;
 import com.xt.utils.SqlUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
@@ -23,41 +23,10 @@ import static java.util.Collections.singletonMap;
 public class QueryHelper {
     @Autowired
     private OqgHelper oqgHelper;
-    private final Logger logger;
-
-    public QueryHelper(Logger logger) {
-        this.logger = logger;
-    }
-    public List<String> getNewerMeterSnsFromTariffTable(){
-
-        List<Map<String, Object>> meterSns = new ArrayList<>();
-
-        // get all unique meterSns,
-        // meterSn must be at least 10 characters long
-        // and must start with 2018, 2019, 2020, 2021 and above
-        String sql = "select distinct meter_sn from tariff " +
-                "where meter_sn is not null and length(meter_sn) > 10 " +
-                "and (meter_sn like '2018%' " +
-                "  or meter_sn like '2019%' " +
-                "  or meter_sn like '2020%' " +
-                "  or meter_sn like '2021%'" +
-                "  or meter_sn like '2022%'" +
-                "  or meter_sn like '2023%'" +
-                "  or meter_sn like '2024%'" +
-                "  or meter_sn like '2025%'" +
-                "  or meter_sn like '2026%'" +
-                "  or meter_sn like '2027%'" +
-                "  or meter_sn like '2028%'" +
-                "  or meter_sn like '2029%'" +
-                "  or meter_sn like '2030%')";
-
-        try {
-            meterSns = oqgHelper.OqgR(sql);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
-    }
+    private final Logger logger = Logger.getLogger(QueryHelper.class.getName());
+//    public QueryHelper(Logger logger) {
+//        this.logger = logger;
+//    }
 
     public List<String> getActiveMeterSns(String tableName){
         String timekey = "kwh_timestamp";
@@ -96,6 +65,22 @@ public class QueryHelper {
             return Map.of("info", "meter not found");
         }
         return meterInfo.get(0);
+    }
+    public Map<String, Object> getMeterInfoDto(String meterSnStr){
+        String sql = "select * from meter where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "meter not found");
+        }
+        Map<String, Object> meterInfoMap = meterInfo.get(0);
+        MeterInfoDto meterInfoDto = MeterInfoDto.fromFieldMap(meterInfoMap);
+
+        return Map.of("meter_info", meterInfoDto);
     }
     public Map<String, Object> getMeterProperty(String meterSnStr, String property){
         String sql = "select " + property + " from meter where meter_sn = '" + meterSnStr + "'";
@@ -609,7 +594,7 @@ public class QueryHelper {
         try {
             meterSn = oqgHelper.OqgR(sqlMeterSn);
         } catch (Exception e) {
-            logger.error("Error getting meter_sn for meterDisplayname: " + meterDisplayname);
+            logger.info("Error getting meter_sn for meterDisplayname: " + meterDisplayname);
             throw new RuntimeException(e);
         }
         if (meterSn.isEmpty()) {
@@ -625,7 +610,7 @@ public class QueryHelper {
         try {
             meterSnList = oqgHelper.OqgR(sqlMeterSn);
         } catch (Exception e) {
-            logger.error("Error getting meter_displayname for meter_sn: " + meterSn);
+            logger.info("Error getting meter_displayname for meter_sn: " + meterSn);
             throw new RuntimeException(e);
         }
         if (meterSnList.isEmpty()) {
@@ -672,7 +657,7 @@ public class QueryHelper {
         try {
             meterCredit = oqgHelper.OqgR(sqlMeterCredit);
         } catch (Exception e) {
-            logger.error("Error getting credit for meterSn: " + meterSnStr);
+            logger.info("Error getting credit for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
         if(meterCredit.isEmpty()){
@@ -688,7 +673,7 @@ public class QueryHelper {
         try {
             concentratorIds = oqgHelper.OqgR(sqlConcentrator);
         } catch (Exception e) {
-            logger.error("Error getting concentrator IDs");
+            logger.info("Error getting concentrator IDs");
             throw new RuntimeException(e);
         }
         if(concentratorIds.isEmpty()){
@@ -704,7 +689,7 @@ public class QueryHelper {
         try {
             concentrator = oqgHelper.OqgR(sqlConcentrator);
         } catch (Exception e) {
-            logger.error("Error getting concentrator_id for meterSn: " + meterSnStr);
+            logger.info("Error getting concentrator_id for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
         if(concentrator.isEmpty()){
@@ -720,7 +705,7 @@ public class QueryHelper {
         try {
             concentrators = oqgHelper.OqgR(sqlConcentrator);
         } catch (Exception e) {
-            logger.error("Error getting concentrator list");
+            logger.info("Error getting concentrator list");
             throw new RuntimeException(e);
         }
 
@@ -735,7 +720,7 @@ public class QueryHelper {
             try {
                 tariff = oqgHelper.OqgR(sqlTariff);
             } catch (Exception e) {
-                logger.error("Error getting tariff for concentratorId: " + concentratorId);
+                logger.info("Error getting tariff for concentratorId: " + concentratorId);
                 throw new RuntimeException(e);
             }
             if(tariff.isEmpty()){
@@ -754,7 +739,7 @@ public class QueryHelper {
         try {
             meter = oqgHelper.OqgR(sql);
         } catch (Exception e) {
-            logger.error("Error getting meter for meterSn: " + meterSnStr);
+            logger.info("Error getting meter for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
         return !meter.isEmpty();
@@ -770,7 +755,7 @@ public class QueryHelper {
         try {
             meterCredit = oqgHelper.OqgR(sqlMeterCredit);
         } catch (Exception e) {
-            logger.error("Error getting credit for meterSn: " + meterSnStr);
+            logger.info("Error getting credit for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
         if(meterCredit.isEmpty()){
@@ -779,75 +764,23 @@ public class QueryHelper {
         }
         return meterCredit.get(0);
     }
+    public Map<String, Object> getRecentMeterKiv(){
+        List<Map<String, Object>>meterKiv = new ArrayList<>();
 
-    public void postMeterKiv(String meterSnStr,
-                             String kivTag,
-                             String postDateTimeStr,
-                             long numOfEvents,
-                             String postedBy,
-                             String sessionId){
-        String meterKivTable = "meter_kiv";
-
-        if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
-            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
-        }
-        if(sessionId == null || sessionId.isEmpty()) {
-            sessionId = UUID.randomUUID().toString();
-        }
-
-        if(!meterSnExistsInMeterTable(meterSnStr)){
-            logger.info("meter_sn: " + meterSnStr + " does not exist in meter table");
-            return;
-        }
-
-        //check if the record for that session_id exists
-        String sqlCheck = "select id, number_of_events from " + meterKivTable +
-                " where meter_sn = '" + meterSnStr +
-                "' and session_id = '" + sessionId + "'";
-        List<Map<String, Object>> meterKiv = new ArrayList<>();
+        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+        String sql = "select * from meter_kiv " +
+                " where kiv_tag != 'missing_ref_bal_epoch' " +
+                " and kiv_tag != 'reading_interval' " +
+                " and kiv_start_timestamp > timestamp '" + sgNow + "' - interval '72 hours' "
+                + " order by kiv_start_timestamp desc";
         try {
-            meterKiv = oqgHelper.OqgR(sqlCheck);
+            meterKiv = oqgHelper.OqgR(sql);
         } catch (Exception e) {
-            logger.error("Error getting meterKiv for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
-        if(meterKiv.isEmpty()) {
-            Map<String, Object> kivSqlMap = Map.of("table", meterKivTable,
-                    "content", Map.of(
-                            "meter_sn", meterSnStr,
-                            "kiv_tag", kivTag,
-                            "kiv_start_timestamp", postDateTimeStr,
-                            "number_of_events", numOfEvents,
-                            "kiv_status","posted",
-                            "posted_by", postedBy,
-                            "session_id", sessionId
-                    ));
-            Map<String, String> sqlInsert = SqlUtil.makeInsertSql(kivSqlMap);
-            if(sqlInsert.get("sql")==null){
-                logger.error("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
-                throw new RuntimeException("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
-            }
-            try {
-                oqgHelper.OqgIU(sqlInsert.get("sql"));
-            } catch (Exception e) {
-                logger.error("Error inserting meterKiv for meterSn: " + meterSnStr);
-                throw new RuntimeException(e);
-            }
-        } else {
-            //update the record
-            long id = MathUtil.ObjToLong(meterKiv.get(0).get("id"));
-            long numOfEventsOld = MathUtil.ObjToLong(meterKiv.get(0).get("number_of_events")==null?0:meterKiv.get(0).get("number_of_events"));
-            long numOfEventsNew = numOfEventsOld + numOfEvents;
-            String sqlUpdate = "update " + meterKivTable + " set number_of_events = " + numOfEventsNew +
-                    " where id = " + id;
-            try {
-                oqgHelper.OqgIU(sqlUpdate);
-            } catch (Exception e) {
-                logger.error("Error updating meterKiv for meterSn: " + meterSnStr);
-                throw new RuntimeException(e);
-            }
-        }
+        return Map.of("meter_kiv", meterKiv);
     }
+
     public void postMeterKiv2(String meterSnStr,
                               String kivTag,
                               String postDateTimeStr,
@@ -878,7 +811,7 @@ public class QueryHelper {
         try {
             meterKiv = oqgHelper.OqgR(sqlCheck);
         } catch (Exception e) {
-            logger.error("Error getting meterKiv for meterSn: " + meterSnStr);
+            logger.info("Error getting meterKiv for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
         if(meterKiv.isEmpty()) {
@@ -896,13 +829,13 @@ public class QueryHelper {
                     ));
             Map<String, String> sqlInsert = SqlUtil.makeInsertSql(kivSqlMap);
             if(sqlInsert.get("sql")==null){
-                logger.error("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
+                logger.info("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
                 throw new RuntimeException("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
             }
             try {
                 oqgHelper.OqgIU(sqlInsert.get("sql"));
             } catch (Exception e) {
-                logger.error("Error inserting meterKiv for meterSn: " + meterSnStr);
+                logger.info("Error inserting meterKiv for meterSn: " + meterSnStr);
                 throw new RuntimeException(e);
             }
         } else {
@@ -915,7 +848,7 @@ public class QueryHelper {
             try {
                 oqgHelper.OqgIU(sqlUpdate);
             } catch (Exception e) {
-                logger.error("Error updating meterKiv for meterSn: " + meterSnStr);
+                logger.info("Error updating meterKiv for meterSn: " + meterSnStr);
                 throw new RuntimeException(e);
             }
         }
@@ -950,7 +883,7 @@ public class QueryHelper {
         try {
             meterKiv = oqgHelper.OqgR(sqlCheck);
         } catch (Exception e) {
-            logger.error("Error getting meterKiv for meterSn: " + meterSnStr);
+            logger.info("Error getting meterKiv for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
         if(meterKiv.isEmpty()) {
@@ -972,13 +905,13 @@ public class QueryHelper {
                     ));
             Map<String, String> sqlInsert = SqlUtil.makeInsertSql(kivSqlMap);
             if(sqlInsert.get("sql")==null){
-                logger.error("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
+                logger.info("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
                 throw new RuntimeException("Error getting insert sql for meterKiv for meterSn: " + meterSnStr);
             }
             try {
                 oqgHelper.OqgIU(sqlInsert.get("sql"));
             } catch (Exception e) {
-                logger.error("Error inserting meterKiv for meterSn: " + meterSnStr);
+                logger.info("Error inserting meterKiv for meterSn: " + meterSnStr);
                 throw new RuntimeException(e);
             }
         } else {
@@ -991,7 +924,7 @@ public class QueryHelper {
             try {
                 oqgHelper.OqgIU(sqlUpdate);
             } catch (Exception e) {
-                logger.error("Error updating meterKiv for meterSn: " + meterSnStr);
+                logger.info("Error updating meterKiv for meterSn: " + meterSnStr);
                 throw new RuntimeException(e);
             }
         }
@@ -1007,7 +940,7 @@ public class QueryHelper {
         try {
             intervals = oqgHelper.OqgR(sql);
         } catch (Exception e) {
-            logger.error("Error getting meter tariff for meterSn: " + meterSnStr);
+            logger.info("Error getting meter tariff for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
 //        if(intervals.isEmpty()){
@@ -1026,7 +959,7 @@ public class QueryHelper {
         try {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
-            logger.error("Error updating meter reading interval for meterSn: " + meterSnStr);
+            logger.info("Error updating meter reading interval for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
     }
@@ -1038,7 +971,7 @@ public class QueryHelper {
         try {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
-            logger.error("Error updating meter mms address for meterSn: " + meterSnStr);
+            logger.info("Error updating meter mms address for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
     }
@@ -1072,7 +1005,7 @@ public class QueryHelper {
         try {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
-            logger.error("Error updating meter mms info for meterSn: " + meterSnStr);
+            logger.info("Error updating meter mms info for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
         }
     }
@@ -1103,7 +1036,7 @@ public class QueryHelper {
         try {
             premises = oqgHelper.OqgR(sel);
         } catch (Exception e) {
-            logger.error("Error getting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
+            logger.info("Error getting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
             throw new RuntimeException(e);
         }
 
@@ -1128,7 +1061,7 @@ public class QueryHelper {
             try {
                 oqgHelper.OqgIU(ins);
             } catch (Exception e) {
-                logger.error("Error inserting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
+                logger.info("Error inserting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
                 throw new RuntimeException(e);
             }
         }else if(premises.size()==1) {
@@ -1145,7 +1078,7 @@ public class QueryHelper {
             try {
                 oqgHelper.OqgIU(upd);
             } catch (Exception e) {
-                logger.error("Error updating premise for address info: " + building + " " + block + " " + level + " " + postalCode);
+                logger.info("Error updating premise for address info: " + building + " " + block + " " + level + " " + postalCode);
                 throw new RuntimeException(e);
             }
         }
@@ -1181,7 +1114,7 @@ public class QueryHelper {
         String iccId = tataInfo.get("icc_id");
         String subId = tataInfo.get("sub_id");
         if(iccId==null || subId==null){
-            logger.error("null tata info for esim_id: " + iccId);
+            logger.info("null tata info for esim_id: " + iccId);
             return;
         }
         //sql to update iccId where esim_id contains iccId
@@ -1191,27 +1124,12 @@ public class QueryHelper {
         try {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
-            logger.error("Error updating meter tata info for esim_id: " + iccId);
+            logger.info("Error updating meter tata info for esim_id: " + iccId);
             throw new RuntimeException(e);
         }
     }
 
-    public Map<String, Object> getRecentMeterKiv(){
-        List<Map<String, Object>>meterKiv = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
-        String sql = "select * from meter_kiv " +
-                " where kiv_tag != 'missing_ref_bal_epoch' " +
-                " and kiv_tag != 'reading_interval' " +
-                " and kiv_start_timestamp > timestamp '" + sgNow + "' - interval '72 hours' "
-                + " order by kiv_start_timestamp desc";
-        try {
-            meterKiv = oqgHelper.OqgR(sql);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return Map.of("meter_kiv", meterKiv);
-    }
 
     public void postOpLog(String postDateTimeStr,
                           String username,
@@ -1245,13 +1163,13 @@ public class QueryHelper {
                 ));
         Map<String, String> sqlInsert = SqlUtil.makeInsertSql(oplogSqlMap);
         if(sqlInsert.get("sql")==null){
-            logger.error("Error getting insert sql for opsLogTable");
+            logger.info("Error getting insert sql for opsLogTable");
             throw new RuntimeException("Error getting insert sql for opsLogTable");
         }
         try {
             oqgHelper.OqgIU(sqlInsert.get("sql"));
         } catch (Exception e) {
-            logger.error("Error inserting opsLogTable");
+            logger.info("Error inserting opsLogTable");
             throw new RuntimeException(e);
         }
     }
