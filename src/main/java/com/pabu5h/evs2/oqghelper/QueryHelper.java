@@ -66,8 +66,24 @@ public class QueryHelper {
         }
         return meterInfo.get(0);
     }
-    public Map<String, Object> getMeterInfoDto(String meterSnStr){
+    public Map<String, Object> getMeterInfoDtoFromSn(String meterSnStr){
         String sql = "select * from meter where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "meter not found");
+        }
+        Map<String, Object> meterInfoMap = meterInfo.get(0);
+        MeterInfoDto meterInfoDto = MeterInfoDto.fromFieldMap(meterInfoMap);
+
+        return Map.of("meter_info", meterInfoDto);
+    }
+    public Map<String, Object> getMeterInfoDtoFromDisplayname(String meterDisplayname){
+        String sql = "select * from meter where meter_displayname = '" + meterDisplayname + "'";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR(sql);
