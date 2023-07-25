@@ -111,7 +111,23 @@ public class QueryHelper {
         }
         return meterInfo.get(0);
     }
+    public Map<String, Object> getConcs(String projectScope){
+        String sql = "select DISTINCT concentrator_id from meter";
+        if(projectScope != null && !projectScope.isEmpty()){
+            sql = "select DISTINCT concentrator_id from meter where scope_str LIKE '%" + projectScope + "%'";
+        }
 
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "concentrator not found");
+        }
+        return Map.of("concentrator_list", meterInfo.stream().map(meter -> meter.get("concentrator_id")).toList());
+    }
     public Map<String, Object> getMmsBuildings(String projectScope){
         String sql = "select DISTINCT mms_building from meter";
         if(projectScope != null && !projectScope.isEmpty()){
