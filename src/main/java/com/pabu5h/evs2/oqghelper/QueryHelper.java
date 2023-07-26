@@ -235,7 +235,7 @@ public class QueryHelper {
 
     public List<Map<String, Object>> getAllMmsMeterInfo(){
         String sql = "select meter_sn, meter_displayname, reading_interval, concentrator_id, commission_timestamp, " +
-                " mms_address, mms_level, mms_block, mms_building, mms_online_timestamp, " +
+                " mms_address, mms_unit, mms_level, mms_block, mms_building, mms_online_timestamp, " +
                 " esim_id, data_subscription_id, scope_str, " +
                 " daily_usage_timestamp " +
                 " from meter " +
@@ -1035,6 +1035,7 @@ public class QueryHelper {
     }
     public void updateMeterMmsInfo(String meterSnStr, Map<String, String> mmsInfo){
         String mmsAddress = mmsInfo.get("mms_address");
+        String mmsUnit = mmsInfo.get("mms_unit");
         String mmsLevel = mmsInfo.get("mms_level");
         String mmsBlk = mmsInfo.get("mms_block");
         String mmsBuilding = mmsInfo.get("mms_building");
@@ -1045,12 +1046,14 @@ public class QueryHelper {
 //        }
         //add escape character for single quote
         mmsAddress = mmsAddress.replace("'", "''");
+        mmsUnit = mmsUnit == null? "": mmsUnit.replace("'", "''");
         mmsBlk = mmsBlk == null? "": mmsBlk.replace("'", "''");
         mmsLevel = mmsLevel == null? "": mmsLevel.replace("'", "''");
         mmsBuilding = mmsBuilding == null? "": mmsBuilding.replace("'", "''");
         eSimId = eSimId == null? "": eSimId;
         String sql = "update meter set " +
                 " mms_address = '" + mmsAddress +
+                "', mms_unit = '" + mmsUnit +
                 "', mms_level = '" + mmsLevel +
                 "', mms_block = '" + mmsBlk +
                 "', mms_building = '" + mmsBuilding +
