@@ -24,9 +24,35 @@ public class QueryHelper {
     @Autowired
     private OqgHelper oqgHelper;
     private final Logger logger = Logger.getLogger(QueryHelper.class.getName());
-//    public QueryHelper(Logger logger) {
-//        this.logger = logger;
-//    }
+
+    public List<String> getNewerMeterSns(){
+        // meterSn must be at least 10 characters long
+        // and must start with 2018, 2019, 2020, 2021 and above
+        String sql = "select meter_sn from meter " +
+                "where length(meter_sn) > 10 " +
+                "and (" +
+                " meter_sn like '2018%' " +
+                " or meter_sn like '2019%' " +
+                " or meter_sn like '2020%' " +
+                " or meter_sn like '2021%'" +
+                " or meter_sn like '2022%'" +
+                " or meter_sn like '2023%'" +
+                " or meter_sn like '2024%'" +
+                " or meter_sn like '2025%'" +
+                " or meter_sn like '2026%'" +
+                " or meter_sn like '2027%'" +
+                " or meter_sn like '2028%'" +
+                " or meter_sn like '2029%'" +
+                " or meter_sn like '2030%')";
+
+        List<Map<String, Object>> meterSns = new ArrayList<>();
+        try {
+            meterSns = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+    }
 
     public List<String> getActiveMeterSns(String tableName){
         String timekey = "kwh_timestamp";
