@@ -175,7 +175,7 @@ public class QueryHelper {
     public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope){
         String sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "'";
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "' and scope_str LIKE '%" + projectScope + "%'";
+            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
@@ -192,7 +192,7 @@ public class QueryHelper {
     public Map<String, Object> getMmsLevels (String building, String block, String projectScope){
         String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'";
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and scope_str LIKE '%" + projectScope + "%'";
+            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
@@ -204,6 +204,23 @@ public class QueryHelper {
             return Map.of("info", "level not found");
         }
         return Map.of("level_list", meterInfo.stream().map(meter -> meter.get("mms_level")).toList());
+    }
+    public Map<String, Object> getMmsUnits (String building, String block, String level, String projectScope){
+        String sql = "select DISTINCT mms_unit from meter where mms_building = '" + building + "' and mms_block = '" + block + "'" +
+                " and mms_level = '" + level + "'";
+        if(projectScope != null && !projectScope.isEmpty()){
+            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+        }
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.size() == 0){
+            return Map.of("info", "unit not found");
+        }
+        return Map.of("unit_list", meterInfo.stream().map(meter -> meter.get("mms_unit")).toList());
     }
 
     public List<Map<String, Object>> getAllMeterInfo(){
