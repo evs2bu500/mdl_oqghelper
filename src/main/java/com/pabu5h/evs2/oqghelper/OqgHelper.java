@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.logging.log4j.LogManager.getLogger;
+
 //@Setter
 @Service
 public class OqgHelper {
@@ -33,11 +35,11 @@ public class OqgHelper {
 //    OqgHelper(RestTemplate template){
 //        restTemplate = template;
 //    }
-    private final Logger logger;
+    private final Logger logger = getLogger(OqgHelper.class.getName());
 
-    public OqgHelper(Logger logger) {
-        this.logger = logger;
-    }
+//    public OqgHelper(Logger logger) {
+//        this.logger = logger;
+//    }
 
     public List<Map<String, Object>> OqgR(String sqlQuery) throws Exception {
         String rUrl = oqgPath + oqgEptR;
