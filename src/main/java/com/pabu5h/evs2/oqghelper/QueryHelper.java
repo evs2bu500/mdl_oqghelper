@@ -140,7 +140,8 @@ public class QueryHelper {
     public Map<String, Object> getConcs(String projectScope){
         String sql = "select DISTINCT concentrator_id from meter";
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = "select DISTINCT concentrator_id from meter where scope_str LIKE '%" + projectScope + "%'";
+            sql = "select DISTINCT concentrator_id from meter where scope_str LIKE '%" + projectScope + "%'"
+            + " ORDER BY concentrator_id ASC";
         }
 
         List<Map<String, Object>> meterInfo = new ArrayList<>();
@@ -157,7 +158,8 @@ public class QueryHelper {
     public Map<String, Object> getMmsBuildings(String projectScope){
         String sql = "select DISTINCT mms_building from meter";
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = "select DISTINCT mms_building from meter where scope_str LIKE '%" + projectScope + "%'";
+            sql = "select DISTINCT mms_building from meter where scope_str LIKE '%" + projectScope + "%'" +
+            " ORDER BY mms_building ASC";
         }
 
         List<Map<String, Object>> meterInfo = new ArrayList<>();
@@ -173,7 +175,8 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope){
-        String sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "'";
+        String sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "'" +
+                " ORDER BY mms_block ASC";
         if(projectScope != null && !projectScope.isEmpty()){
             sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
         }
@@ -190,7 +193,8 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getMmsLevels (String building, String block, String projectScope){
-        String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'";
+        String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'"
+                + " ORDER BY mms_level ASC";
         if(projectScope != null && !projectScope.isEmpty()){
             sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
         }
@@ -207,7 +211,8 @@ public class QueryHelper {
     }
     public Map<String, Object> getMmsUnits (String building, String block, String level, String projectScope){
         String sql = "select DISTINCT mms_unit from meter where mms_building = '" + building + "' and mms_block = '" + block + "'" +
-                " and mms_level = '" + level + "'";
+                " and mms_level = '" + level + "'"
+                + " ORDER BY mms_unit ASC";
         if(projectScope != null && !projectScope.isEmpty()){
             sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
         }
