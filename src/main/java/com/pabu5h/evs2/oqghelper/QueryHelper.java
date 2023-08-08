@@ -178,7 +178,10 @@ public class QueryHelper {
         String sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "'" +
                 " ORDER BY mms_block ASC";
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+            // syntax error
+//            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+            sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "' and scope_str LIKE '%" + projectScope + "%'" +
+                    " ORDER BY mms_block ASC";
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
@@ -196,7 +199,10 @@ public class QueryHelper {
         String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'"
                 + " ORDER BY mms_level ASC";
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+            // syntax error
+//            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+            sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and scope_str LIKE '%" + projectScope + "%'"
+                    + " ORDER BY mms_level ASC";
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
@@ -214,7 +220,10 @@ public class QueryHelper {
                 " and mms_level = '" + level + "'"
                 + " ORDER BY mms_unit ASC";
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+            // syntax error
+//            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+            sql = "select DISTINCT mms_unit from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and mms_level = '" + level + "' and scope_str LIKE '%" + projectScope + "%'"
+                    + " ORDER BY mms_unit ASC";
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
