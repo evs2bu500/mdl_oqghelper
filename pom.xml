@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.pabu5h.evs2</groupId>
 	<artifactId>oqghelper</artifactId>
-	<version>2.5.5</version>
+	<version>2.5.6</version>
 	<name>OqgHelper</name>
 	<description>OqgHelper</description>
 
@@ -40,12 +40,12 @@
 		<dependency>
 			<groupId>com.github.evs2bu500</groupId>
 			<artifactId>mdl_util</artifactId>
-			<version>2.9.1</version>
+			<version>2.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.evs2bu500</groupId>
 			<artifactId>mdl_evs2dto</artifactId>
-			<version>1.6.20</version>
+			<version>1.6.23</version>
 		</dependency>
 
 		<dependency>
