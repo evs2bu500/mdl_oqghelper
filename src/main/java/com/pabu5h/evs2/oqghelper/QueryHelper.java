@@ -87,7 +87,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
         return meterInfo.get(0);
@@ -100,7 +100,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
         Map<String, Object> meterInfoMap = meterInfo.get(0);
@@ -116,7 +116,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
         Map<String, Object> meterInfoMap = meterInfo.get(0);
@@ -132,7 +132,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
         return meterInfo.get(0);
@@ -150,7 +150,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "concentrator not found");
         }
         return Map.of("concentrator_list", meterInfo.stream().map(meter -> meter.get("concentrator_id")).toList());
@@ -168,7 +168,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "building not found");
         }
         return Map.of("building_list", meterInfo.stream().map(meter -> meter.get("mms_building")).toList());
@@ -189,7 +189,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "block not found");
         }
         return Map.of("block_list", meterInfo.stream().map(meter -> meter.get("mms_block")).toList());
@@ -210,7 +210,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "level not found");
         }
         return Map.of("level_list", meterInfo.stream().map(meter -> meter.get("mms_level")).toList());
@@ -231,7 +231,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "unit not found");
         }
         return Map.of("unit_list", meterInfo.stream().map(meter -> meter.get("mms_unit")).toList());
@@ -301,7 +301,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(meterInfo.size() == 0){
+        if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
         return meterInfo.get(0);
@@ -329,7 +329,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(count.size() == 0){
+        if(count.isEmpty()){
             return 0;
         }
         return Long.parseLong(count.get(0).get("count").toString());
@@ -391,7 +391,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(count.size() == 0){
+        if(count.isEmpty()){
             return Collections.singletonMap("info", "no data");
         }
         //sort by date in descending order
@@ -416,7 +416,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(kwhConsumption.size() == 0){
+        if(kwhConsumption.isEmpty()){
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
@@ -439,7 +439,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(kwhConsumption.size() == 0){
+        if(kwhConsumption.isEmpty()){
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
@@ -463,7 +463,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(dataConsumption.size() == 0){
+        if(dataConsumption.isEmpty()){
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
@@ -517,7 +517,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(kwhConsumption.size() == 0){
+        if(kwhConsumption.isEmpty()){
             return Collections.singletonMap("info", "no data");
         }
         //sort by date in descending order
@@ -543,7 +543,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(topupTotal.size() == 0){
+        if(topupTotal.isEmpty()){
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
@@ -601,7 +601,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(totalTopup.size() == 0){
+        if(totalTopup.isEmpty()){
             return Collections.singletonMap("info", "no data");
         }
         //sort by date in descending order
@@ -629,7 +629,7 @@ public class QueryHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if(totalConsumptions.size() == 0){
+        if(totalConsumptions.isEmpty()){
             return Collections.singletonMap("info", "no data");
         }
 //        //sort by date in descending order
@@ -821,6 +821,23 @@ public class QueryHelper {
                             "offer_id", MathUtil.ObjToLong(tariff.get(0).get("offer_id"))));
         }
         return concentratorTariff;
+    }
+    public Map<String, Object> getMeterTariffFromSn(String meterSnStr){
+        String sqlMeterTariff = "select tariff_price from concentrator_tariff " +
+                " inner join meter on meter.concentrator_id = concentrator_tariff.concentrator_id " +
+                " where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meterTariff = new ArrayList<>();
+        try {
+            meterTariff = oqgHelper.OqgR(sqlMeterTariff);
+        } catch (Exception e) {
+            logger.info("Error getting tariff for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(meterTariff.isEmpty()){
+            logger.info("tariff is empty for meterSn: " + meterSnStr);
+            return Collections.singletonMap("info", "tariff is empty for meterSn: " + meterSnStr);
+        }
+        return meterTariff.get(0);
     }
     public boolean meterSnExistsInMeterTable(String meterSnStr){
         String sql = "select id from meter where meter_sn = '" + meterSnStr + "'";
