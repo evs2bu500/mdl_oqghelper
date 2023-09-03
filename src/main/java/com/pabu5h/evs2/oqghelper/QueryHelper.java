@@ -1,5 +1,6 @@
 package com.pabu5h.evs2.oqghelper;
 
+import com.pabu5h.evs2.dto.MeterBypassDto;
 import com.pabu5h.evs2.dto.MeterInfoDto;
 import com.xt.utils.DateTimeUtil;
 import com.xt.utils.MathUtil;
@@ -1316,7 +1317,54 @@ public class QueryHelper {
         }
     }
 
-
+    public Map<String, Object> getMeterEffectiveBypassPolicy(String meterSnStr){
+        String sql = "select * from meter_bypass_policy where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> bypassPolicy = new ArrayList<>();
+        try {
+            bypassPolicy = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            logger.info("Error getting bypass policy for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(bypassPolicy.isEmpty()){
+            logger.info("bypass policy is empty for meterSn: " + meterSnStr);
+            return Collections.singletonMap("info", "bypass policy is empty for meterSn: " + meterSnStr);
+        }
+        //        return bypassPolicy.get(0);
+        Map<String, Object> effectiveBypassPolicy = bypassPolicy.get(0);
+        boolean bypassAlways = effectiveBypassPolicy.get("bypass_always") != null && (boolean) effectiveBypassPolicy.get("bypass_always");
+        if(bypassAlways){
+            return Map.of("bypass_always", true);
+        }
+        LocalDateTime localNow = DateTimeUtil.getSgNow();
+        //if bypass end is before now, remove bypass start and end
+        String bypass1EndTimestampStr = (String) effectiveBypassPolicy.get("bypass1_end_timestamp");
+        if(bypass1EndTimestampStr!=null && !bypass1EndTimestampStr.isEmpty()){
+            LocalDateTime bypass1EndTimestamp = DateTimeUtil.getLocalDateTime(bypass1EndTimestampStr);
+            if(bypass1EndTimestamp.isBefore(localNow)){
+                effectiveBypassPolicy.remove("bypass1_start_timestamp");
+                effectiveBypassPolicy.remove("bypass1_end_timestamp");
+            }
+        }
+        String bypass2EndTimestampStr = (String) effectiveBypassPolicy.get("bypass2_end_timestamp");
+        if(bypass2EndTimestampStr!=null && !bypass2EndTimestampStr.isEmpty()){
+            LocalDateTime bypass2EndTimestamp = DateTimeUtil.getLocalDateTime(bypass2EndTimestampStr);
+            if(bypass2EndTimestamp.isBefore(localNow)){
+                effectiveBypassPolicy.remove("bypass2_start_timestamp");
+                effectiveBypassPolicy.remove("bypass2_end_timestamp");
+            }
+        }
+        String bypass3EndTimestampStr = (String) effectiveBypassPolicy.get("bypass3_end_timestamp");
+        if(bypass3EndTimestampStr!=null && !bypass3EndTimestampStr.isEmpty()){
+            LocalDateTime bypass3EndTimestamp = DateTimeUtil.getLocalDateTime(bypass3EndTimestampStr);
+            if(bypass3EndTimestamp.isBefore(localNow)){
+                effectiveBypassPolicy.remove("bypass3_start_timestamp");
+                effectiveBypassPolicy.remove("bypass3_end_timestamp");
+            }
+        }
+        MeterBypassDto meterBypassDto = MeterBypassDto.fromFieldMap(effectiveBypassPolicy);
+        return Map.of("effective_bypass_policy", meterBypassDto);
+    }
 
     public void postOpLog(String postDateTimeStr,
                           String username,
