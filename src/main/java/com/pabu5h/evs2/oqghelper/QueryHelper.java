@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -1337,11 +1338,13 @@ public class QueryHelper {
             return Map.of("bypass_always", true);
         }
         LocalDateTime localNow = DateTimeUtil.getSgNow();
+        //consider effective bypass policy only if end timestamp is not too long ago
+        LocalDateTime refTime = localNow.minusDays(21);
         //if bypass end is before now, remove bypass start and end
         String bypass1EndTimestampStr = (String) effectiveBypassPolicy.get("bypass1_end_timestamp");
         if(bypass1EndTimestampStr!=null && !bypass1EndTimestampStr.isEmpty()){
             LocalDateTime bypass1EndTimestamp = DateTimeUtil.getLocalDateTime(bypass1EndTimestampStr);
-            if(bypass1EndTimestamp.isBefore(localNow)){
+            if(bypass1EndTimestamp.isBefore(refTime)){
                 effectiveBypassPolicy.remove("bypass1_start_timestamp");
                 effectiveBypassPolicy.remove("bypass1_end_timestamp");
             }
@@ -1349,7 +1352,7 @@ public class QueryHelper {
         String bypass2EndTimestampStr = (String) effectiveBypassPolicy.get("bypass2_end_timestamp");
         if(bypass2EndTimestampStr!=null && !bypass2EndTimestampStr.isEmpty()){
             LocalDateTime bypass2EndTimestamp = DateTimeUtil.getLocalDateTime(bypass2EndTimestampStr);
-            if(bypass2EndTimestamp.isBefore(localNow)){
+            if(bypass2EndTimestamp.isBefore(refTime)){
                 effectiveBypassPolicy.remove("bypass2_start_timestamp");
                 effectiveBypassPolicy.remove("bypass2_end_timestamp");
             }
@@ -1357,7 +1360,7 @@ public class QueryHelper {
         String bypass3EndTimestampStr = (String) effectiveBypassPolicy.get("bypass3_end_timestamp");
         if(bypass3EndTimestampStr!=null && !bypass3EndTimestampStr.isEmpty()){
             LocalDateTime bypass3EndTimestamp = DateTimeUtil.getLocalDateTime(bypass3EndTimestampStr);
-            if(bypass3EndTimestamp.isBefore(localNow)){
+            if(bypass3EndTimestamp.isBefore(refTime)){
                 effectiveBypassPolicy.remove("bypass3_start_timestamp");
                 effectiveBypassPolicy.remove("bypass3_end_timestamp");
             }
