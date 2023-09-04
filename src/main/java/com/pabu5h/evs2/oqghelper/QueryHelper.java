@@ -1368,7 +1368,25 @@ public class QueryHelper {
         MeterBypassDto meterBypassDto = MeterBypassDto.fromFieldMap(effectiveBypassPolicy);
         return Map.of("effective_bypass_policy", meterBypassDto);
     }
-
+    public Map<String, Object> getBypassTariff(String meterSnStr, String fromTimestamp, String toTimestamp){
+        String sql = "select tariff_timestamp, debit_ref from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+                " and debit_ref like '%bypass%' " +
+                " and tariff_timestamp >= '" + fromTimestamp + "'" +
+                " and tariff_timestamp <= '" + toTimestamp + "'" +
+                " order by tariff_timestamp desc ";
+        List<Map<String, Object>> bypasses = new ArrayList<>();
+        try {
+            bypasses = oqgHelper.OqgR(sql);
+        } catch (Exception e) {
+            logger.info("Error getting bypass for meterSn: " + meterSnStr);
+            return Collections.singletonMap("error", "Error getting bypass for meterSn: " + meterSnStr);
+        }
+        if(bypasses.isEmpty()){
+            logger.info("bypass is empty for meterSn: " + meterSnStr);
+            return Collections.singletonMap("info", "bypass is empty for meterSn: " + meterSnStr);
+        }
+        return Map.of("bypasses", bypasses);
+    }
     public void postOpLog(String postDateTimeStr,
                           String username,
                           String target,
