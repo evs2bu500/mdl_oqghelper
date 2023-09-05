@@ -1437,7 +1437,7 @@ public class QueryHelper {
             //get bypass from meter_reading_daily
             String sql1 = "select bypass_count from meter_reading_daily where " +
                     " meter_displayname = '" + meterDisplaynameStr + "'" +
-                    " and kwh_timestamp == '" + toTimestamp + "'";
+                    " and kwh_timestamp = '" + toTimestamp + "'";
             List<Map<String, Object>> resp1 = new ArrayList<>();
             try {
                 resp1 = oqgHelper.OqgR(sql1);
