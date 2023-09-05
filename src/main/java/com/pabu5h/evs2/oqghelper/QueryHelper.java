@@ -1387,7 +1387,7 @@ public class QueryHelper {
         }
         return Map.of("bypasses", bypasses);
     }
-    public Map<String, Object> getDailyBypassTotal(String meterSnStr, List<Map<String, String>> dailyTimeSlot){
+    public Map<String, Object> getDailyBypassCount(String meterSnStr, List<Map<String, String>> dailyTimeSlot){
         if(dailyTimeSlot.isEmpty()){
             return Collections.singletonMap("error", "dailyTimeSlot is empty");
         }
@@ -1423,6 +1423,67 @@ public class QueryHelper {
             bypasses.add(Map.of("from_timestamp", fromTimestamp,
                                 "to_timestamp", toTimestamp,
                                 "bypass_count", count));
+        }
+        return Map.of("bypasses", bypasses);
+    }
+    public Map<String, Object> getDailyBypassCount2(String meterSnStr, String meterDisplaynameStr, List<Map<String, String>> dailyTimeSlot){
+        if(dailyTimeSlot.isEmpty()){
+            return Collections.singletonMap("error", "dailyTimeSlot is empty");
+        }
+        List<Map<String, String>> bypasses = new ArrayList<>();
+        for (Map<String, String> timeSlot : dailyTimeSlot) {
+            String fromTimestamp = timeSlot.get("from_timestamp");
+            String toTimestamp = timeSlot.get("to_timestamp");
+            //get bypass from meter_reading_daily
+            String sql1 = "select bypass_count from meter_reading_daily where " +
+                    " meter_displayname = '" + meterDisplaynameStr + "'" +
+                    " and kwh_timestamp == '" + toTimestamp + "'";
+            List<Map<String, Object>> resp1 = new ArrayList<>();
+            try {
+                resp1 = oqgHelper.OqgR(sql1);
+            } catch (Exception e) {
+                logger.info("Error getting bypass for meterSn: " + meterSnStr + "in meter_reading_daily");
+                continue;
+            }
+            if(resp1.isEmpty()){
+                logger.info("bypass is empty for meterSn: " + meterSnStr + "in meter_reading_daily");
+            }else {
+                String count1 = (String) resp1.get(0).get("bypass_count");
+                bypasses.add(Map.of("from_timestamp", fromTimestamp,
+                                    "to_timestamp", toTimestamp,
+                                    "bypass_count", count1));
+                continue;
+            }
+            //get bypass from meter_tariff
+            String slotSql = "select count(*) as bypass_count from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+                    " and debit_ref like '%bypass%' " +
+                    " and tariff_timestamp >= '" + fromTimestamp + "'" +
+                    " and tariff_timestamp <= '" + toTimestamp + "'";
+            List<Map<String, Object>> resp2 = new ArrayList<>();
+            try {
+                resp2 = oqgHelper.OqgR(slotSql);
+            } catch (Exception e) {
+                logger.info("Error getting bypass for meterSn: " + meterSnStr + "in meter_tariff");
+                continue;
+            }
+            if(resp2.isEmpty()){
+                logger.info("bypass is empty for meterSn: " + meterSnStr + "in meter_tariff");
+                continue;
+            }
+            String count2 = (String)resp2.get(0).get("bypass_count");
+            bypasses.add(Map.of("from_timestamp", fromTimestamp,
+                                "to_timestamp", toTimestamp,
+                                "bypass_count", count2));
+            //update meter_reading_daily
+            String sqlUpdate = "update meter_reading_daily set bypass_count = " + count2 +
+                    " where meter_displayname = '" + meterDisplaynameStr + "'" +
+                    " and kwh_timestamp == '" + toTimestamp + "'";
+            try {
+                oqgHelper.OqgIU(sqlUpdate);
+            } catch (Exception e) {
+                logger.info("Error updating bypass for meterSn: " + meterSnStr + "in meter_reading_daily");
+                continue;
+            }
         }
         return Map.of("bypasses", bypasses);
     }
