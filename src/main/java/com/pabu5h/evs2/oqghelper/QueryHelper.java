@@ -1395,23 +1395,35 @@ public class QueryHelper {
         for (Map<String, String> timeSlot : dailyTimeSlot) {
             String fromTimestamp = timeSlot.get("from_timestamp");
             String toTimestamp = timeSlot.get("to_timestamp");
-            String slotSql = "select '"+toTimestamp+"', count(*) as bypass_count from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+            String slotSql = "select count(*) as bypass_count from meter_tariff where meter_sn = '" + meterSnStr + "'" +
                     " and debit_ref like '%bypass%' " +
                     " and tariff_timestamp >= '" + fromTimestamp + "'" +
                     " and tariff_timestamp <= '" + toTimestamp + "'";
             sql.append(slotSql).append(" union all ");
         }
         sql.delete(sql.length()-11, sql.length());
-        List<Map<String, Object>> bypasses = new ArrayList<>();
+        List<Map<String, Object>> resp = new ArrayList<>();
         try {
-            bypasses = oqgHelper.OqgR(sql.toString());
+            resp = oqgHelper.OqgR(sql.toString());
         } catch (Exception e) {
             logger.info("Error getting bypass for meterSn: " + meterSnStr);
             return Collections.singletonMap("error", "Error getting bypass for meterSn: " + meterSnStr);
         }
-        if(bypasses.isEmpty()){
+        if(resp.isEmpty()){
             logger.info("bypass is empty for meterSn: " + meterSnStr);
             return Collections.singletonMap("info", "bypass is empty for meterSn: " + meterSnStr);
+        }
+        List<Map<String, String>> bypasses = new ArrayList<>();
+        for(Map<String, String> timeslot : dailyTimeSlot){
+            String fromTimestamp = timeslot.get("from_timestamp");
+            String toTimestamp = timeslot.get("to_timestamp");
+            long count = resp.stream().filter(m -> {
+                String ts = (String) m.get("tariff_timestamp");
+                return ts.compareTo(fromTimestamp)>=0 && ts.compareTo(toTimestamp)<=0;
+            }).map(m -> MathUtil.ObjToLong(m.get("bypass_count"))).reduce(0L, Long::sum);
+            bypasses.add(Map.of("from_timestamp", fromTimestamp,
+                                "to_timestamp", toTimestamp,
+                                "bypass_count", String.valueOf(count)));
         }
         return Map.of("bypasses", bypasses);
     }
