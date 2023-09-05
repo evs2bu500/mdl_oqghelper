@@ -1387,6 +1387,34 @@ public class QueryHelper {
         }
         return Map.of("bypasses", bypasses);
     }
+    public Map<String, Object> getDailyBypassTotal(String meterSnStr, List<Map<String, String>> dailyTimeSlot){
+        if(dailyTimeSlot.isEmpty()){
+            return Collections.singletonMap("error", "dailyTimeSlot is empty");
+        }
+        StringBuilder sql = new StringBuilder();
+        for (Map<String, String> timeSlot : dailyTimeSlot) {
+            String fromTimestamp = timeSlot.get("from_timestamp");
+            String toTimestamp = timeSlot.get("to_timestamp");
+            String slotSql = "select count(*) as bypass_count from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+                    " and debit_ref like '%bypass%' " +
+                    " and tariff_timestamp >= '" + fromTimestamp + "'" +
+                    " and tariff_timestamp <= '" + toTimestamp + "'";
+            sql.append(slotSql).append(" union ");
+        }
+        sql.delete(sql.length()-7, sql.length());
+        List<Map<String, Object>> bypasses = new ArrayList<>();
+        try {
+            bypasses = oqgHelper.OqgR(sql.toString());
+        } catch (Exception e) {
+            logger.info("Error getting bypass for meterSn: " + meterSnStr);
+            return Collections.singletonMap("error", "Error getting bypass for meterSn: " + meterSnStr);
+        }
+        if(bypasses.isEmpty()){
+            logger.info("bypass is empty for meterSn: " + meterSnStr);
+            return Collections.singletonMap("info", "bypass is empty for meterSn: " + meterSnStr);
+        }
+        return Map.of("bypasses", bypasses);
+    }
     public void postOpLog(String postDateTimeStr,
                           String username,
                           String target,
