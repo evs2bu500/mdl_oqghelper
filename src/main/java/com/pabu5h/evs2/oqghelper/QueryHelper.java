@@ -1414,16 +1414,15 @@ public class QueryHelper {
             return Collections.singletonMap("info", "bypass is empty for meterSn: " + meterSnStr);
         }
         List<Map<String, String>> bypasses = new ArrayList<>();
+        int i = 0;
         for(Map<String, String> timeslot : dailyTimeSlot){
             String fromTimestamp = timeslot.get("from_timestamp");
             String toTimestamp = timeslot.get("to_timestamp");
-            long count = resp.stream().filter(m -> {
-                String ts = (String) m.get("tariff_timestamp");
-                return ts.compareTo(fromTimestamp)>=0 && ts.compareTo(toTimestamp)<=0;
-            }).map(m -> MathUtil.ObjToLong(m.get("bypass_count"))).reduce(0L, Long::sum);
+            String count = resp.get(i++).get("bypass_count").toString();
+
             bypasses.add(Map.of("from_timestamp", fromTimestamp,
                                 "to_timestamp", toTimestamp,
-                                "bypass_count", String.valueOf(count)));
+                                "bypass_count", count));
         }
         return Map.of("bypasses", bypasses);
     }
