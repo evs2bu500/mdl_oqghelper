@@ -1395,13 +1395,13 @@ public class QueryHelper {
         for (Map<String, String> timeSlot : dailyTimeSlot) {
             String fromTimestamp = timeSlot.get("from_timestamp");
             String toTimestamp = timeSlot.get("to_timestamp");
-            String slotSql = "select count(*) as bypass_count from meter_tariff where meter_sn = '" + meterSnStr + "'" +
+            String slotSql = "select '"+toTimestamp+"', count(*) as bypass_count from meter_tariff where meter_sn = '" + meterSnStr + "'" +
                     " and debit_ref like '%bypass%' " +
                     " and tariff_timestamp >= '" + fromTimestamp + "'" +
                     " and tariff_timestamp <= '" + toTimestamp + "'";
-            sql.append(slotSql).append(" union ");
+            sql.append(slotSql).append(" union all");
         }
-        sql.delete(sql.length()-7, sql.length());
+        sql.delete(sql.length()-10, sql.length());
         List<Map<String, Object>> bypasses = new ArrayList<>();
         try {
             bypasses = oqgHelper.OqgR(sql.toString());
