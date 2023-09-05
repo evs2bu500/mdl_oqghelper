@@ -1399,9 +1399,9 @@ public class QueryHelper {
                     " and debit_ref like '%bypass%' " +
                     " and tariff_timestamp >= '" + fromTimestamp + "'" +
                     " and tariff_timestamp <= '" + toTimestamp + "'";
-            sql.append(slotSql).append(" union all");
+            sql.append(slotSql).append(" union all ");
         }
-        sql.delete(sql.length()-10, sql.length());
+        sql.delete(sql.length()-11, sql.length());
         List<Map<String, Object>> bypasses = new ArrayList<>();
         try {
             bypasses = oqgHelper.OqgR(sql.toString());
