@@ -1478,7 +1478,7 @@ public class QueryHelper {
             //update meter_reading_daily
             String sqlUpdate = "update meter_reading_daily set bypass_count = " + count2 +
                     " where meter_displayname = '" + meterDisplaynameStr + "'" +
-                    " and kwh_timestamp == '" + toTimestamp + "'";
+                    " and kwh_timestamp = '" + toTimestamp + "'";
             try {
                 oqgHelper.OqgIU(sqlUpdate);
             } catch (Exception e) {
