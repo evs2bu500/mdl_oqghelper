@@ -32,6 +32,9 @@ public class OqgHelper {
     @Value("${oqg.ept.del}")
     private String oqgEptDel;
 
+    @Value("${oqg.ept.r2}")
+    private String oqgEptR2;
+
 //    OqgHelper(RestTemplate template){
 //        restTemplate = template;
 //    }
@@ -57,7 +60,7 @@ public class OqgHelper {
 
             if(response.getStatusCode() == HttpStatus.OK) {
                 if (response.getBody() == null){
-                    String msg = "OQG Query Error: Response body is null";
+                    String msg = "OQG R Error: Response body is null";
                     logger.info(msg);
                     throw new Exception(msg);
                 }
@@ -68,12 +71,53 @@ public class OqgHelper {
                 ObjectMapper objectMapper = new ObjectMapper();
                 return objectMapper.readValue(response.getBody(), new TypeReference<List<Map<String, Object>>>(){});
             }else{
-                String msg = "OQG Query Error: " + response.getStatusCode();
+                String msg = "OQG R Error: " + response.getStatusCode();
                 logger.info(msg);
                 throw new Exception(msg);
             }
         } catch (Exception e){
-            String msg = "OQG Query Error: " + e.getMessage();
+            String msg = "OQG R Error: " + e.getMessage();
+            logger.info(msg);
+            throw new Exception(msg);
+        }
+    }
+
+    public List<Map<String, Object>> OqgR2(String sqlQuery, boolean useReadReplica) throws Exception {
+        String rUrl = oqgPath + oqgEptR;
+        if(useReadReplica){
+            rUrl = oqgPath + oqgEptR2;
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> payloadForJson = new HashMap<>();
+        payloadForJson.put("sql", sqlQuery);
+
+        // Create the request entity
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payloadForJson, headers);
+
+        try {
+            // Make the request using RestTemplate
+            ResponseEntity<String> response = restTemplate.postForEntity(rUrl, requestEntity, String.class);
+
+            if(response.getStatusCode() == HttpStatus.OK) {
+                if (response.getBody() == null){
+                    String msg = "OQG R2 Error: Response body is null";
+                    logger.info(msg);
+                    throw new Exception(msg);
+                }
+                if(response.getBody().equals("[]")){
+                    return List.of();
+                }
+                // Convert the response body to the desired object
+                ObjectMapper objectMapper = new ObjectMapper();
+                return objectMapper.readValue(response.getBody(), new TypeReference<List<Map<String, Object>>>(){});
+            }else{
+                String msg = "OQG R2 Error: " + response.getStatusCode();
+                logger.info(msg);
+                throw new Exception(msg);
+            }
+        } catch (Exception e){
+            String msg = "OQG R2 Error: " + e.getMessage();
             logger.info(msg);
             throw new Exception(msg);
         }

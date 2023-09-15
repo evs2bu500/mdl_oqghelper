@@ -6,6 +6,7 @@ import com.xt.utils.DateTimeUtil;
 import com.xt.utils.MathUtil;
 import com.xt.utils.SqlUtil;
 
+import jdk.jshell.execution.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class QueryHelper {
 
         List<Map<String, Object>> meterSns = new ArrayList<>();
         try {
-            meterSns = oqgHelper.OqgR(sql);
+            meterSns = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -74,7 +75,7 @@ public class QueryHelper {
                 " where " + timekey + " > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
-            meterSns = oqgHelper.OqgR(sql);
+            meterSns = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,7 +86,7 @@ public class QueryHelper {
         String sql = "select * from meter where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -98,7 +99,7 @@ public class QueryHelper {
         String sql = "select * from meter where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -114,7 +115,7 @@ public class QueryHelper {
         String sql = "select * from meter where meter_displayname = '" + meterDisplayname + "'";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -130,7 +131,7 @@ public class QueryHelper {
         String sql = "select " + property + " from meter where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -148,7 +149,7 @@ public class QueryHelper {
 
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -166,7 +167,7 @@ public class QueryHelper {
 
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -187,7 +188,7 @@ public class QueryHelper {
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -208,7 +209,7 @@ public class QueryHelper {
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -229,7 +230,7 @@ public class QueryHelper {
         }
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -246,26 +247,12 @@ public class QueryHelper {
                 " inner join premise p on meter.premise_id = p.id";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return meterInfo;
     }
-//    public List<Map<String, Object>> getAllMeterInfo2(){
-//        String sql = "select meter_sn, meter_displayname, reading_interval, concentrator_id, commission_timestamp, " +
-//                " mms_address, mms_level, mms_block, mms_building, " +
-//                " esim_id, data_subscription_id " +
-//                " from meter";
-//        List<Map<String, Object>> meterInfo = new ArrayList<>();
-//        try {
-//            meterInfo = oqgHelper.OqgR(sql);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//        return meterInfo;
-//    }
-
     public List<Map<String, Object>> getAllMmsMeterInfo(){
         String sql = "select meter_sn, meter_displayname, reading_interval, concentrator_id, commission_timestamp, " +
                 " mms_address, mms_unit, mms_level, mms_block, mms_building, mms_online_timestamp, " +
@@ -275,7 +262,7 @@ public class QueryHelper {
                 " where esim_id is not null and esim_id != '' ";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -283,7 +270,7 @@ public class QueryHelper {
     }
 
     public void insertMeterDataBal(String meterSn, String dataBal, String initBal){
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+        String sgNow = DateTimeUtil.getSgNowStr();
         String tableName = "meter_comm_data";
 
         String sql = "insert into " + tableName + " (meter_sn, data_bal, data_bal_ini, data_bal_timestamp) " +
@@ -299,7 +286,7 @@ public class QueryHelper {
         String sql = "select * from " + tableName + " where meter_sn = '" + meterSnStr + "' order by data_bal_timestamp desc limit 1";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
-            meterInfo = oqgHelper.OqgR(sql);
+            meterInfo = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -327,7 +314,7 @@ public class QueryHelper {
                 " where " + timekey + " > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
-            count = oqgHelper.OqgR(sql);
+            count = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -389,7 +376,7 @@ public class QueryHelper {
         String sql = queryBuilder.toString();
 
         try {
-            count = oqgHelper.OqgR(sql);
+            count = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -414,7 +401,7 @@ public class QueryHelper {
                 " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
-            kwhConsumption = oqgHelper.OqgR(sql);
+            kwhConsumption = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -437,7 +424,7 @@ public class QueryHelper {
                 " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
-            kwhConsumption = oqgHelper.OqgR(sql);
+            kwhConsumption = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -461,7 +448,7 @@ public class QueryHelper {
                 " and data_bal_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
 
         try {
-            dataConsumption = oqgHelper.OqgR(sql);
+            dataConsumption = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -515,7 +502,7 @@ public class QueryHelper {
         String sql = queryBuilder.toString();
         List<Map<String, Object>> kwhConsumption = new ArrayList<>();
         try {
-            kwhConsumption = oqgHelper.OqgR(sql);
+            kwhConsumption = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -541,7 +528,7 @@ public class QueryHelper {
                 " and payment_mode != 4" +
                 " and response_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
         try {
-            topupTotal = oqgHelper.OqgR(sql);
+            topupTotal = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -599,7 +586,7 @@ public class QueryHelper {
         String sql = queryBuilder.toString();
         List<Map<String, Object>> totalTopup = new ArrayList<>();
         try {
-            totalTopup = oqgHelper.OqgR(sql);
+            totalTopup = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -627,7 +614,7 @@ public class QueryHelper {
 
         List<Map<String, Object>> totalConsumptions = new ArrayList<>();
         try {
-            totalConsumptions = oqgHelper.OqgR(sql);
+            totalConsumptions = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -652,7 +639,7 @@ public class QueryHelper {
         String sql = "select distinct meter_sn from " + tableName;
 
         try {
-            meterSns = oqgHelper.OqgR(sql);
+            meterSns = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -665,25 +652,11 @@ public class QueryHelper {
         }
         return meterSnList;
     }
-
-//    public List<String> getMeterSnsFromMeterTariffTable(){
-//        List<Map<String, Object>> meterSns = new ArrayList<>();
-//
-//        String sql = "select distinct meter_sn from meter_tariff";
-//
-//        try {
-//            meterSns = oqgHelper.OqgR(sql);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
-//    }
-
     public String getMeterSnFromMeterDisplayname(String meterDisplayname) {
-        String sqlMeterSn = "select meter_sn from meter where meter_displayname = '" + meterDisplayname + "'";
+        String sql = "select meter_sn from meter where meter_displayname = '" + meterDisplayname + "'";
         List<Map<String, Object>> meterSn = new ArrayList<>();
         try {
-            meterSn = oqgHelper.OqgR(sqlMeterSn);
+            meterSn = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting meter_sn for meterDisplayname: " + meterDisplayname);
             throw new RuntimeException(e);
@@ -696,10 +669,10 @@ public class QueryHelper {
     }
 
     public String getMeterDisplaynameFromSn(String meterSn) {
-        String sqlMeterSn = "select meter_displayname from meter where meter_sn = '" + meterSn + "'";
+        String sql = "select meter_displayname from meter where meter_sn = '" + meterSn + "'";
         List<Map<String, Object>> meterSnList = new ArrayList<>();
         try {
-            meterSnList = oqgHelper.OqgR(sqlMeterSn);
+            meterSnList = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting meter_displayname for meter_sn: " + meterSn);
             throw new RuntimeException(e);
@@ -742,11 +715,11 @@ public class QueryHelper {
         if(tableName == null || tableName.isBlank()){
             tableName = "meter_tariff";
         }
-        String sqlMeterCredit = "select ref_bal from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
+        String sql = "select ref_bal from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
                 " and ref_bal is not null order by tariff_timestamp desc limit 1";
         List<Map<String, Object>> meterCredit = new ArrayList<>();
         try {
-            meterCredit = oqgHelper.OqgR(sqlMeterCredit);
+            meterCredit = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting credit for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -759,10 +732,10 @@ public class QueryHelper {
     }
 
     public List<Long> getConcentratorIDs(){
-        String sqlConcentrator = "select id from concentrator";
+        String sql = "select id from concentrator";
         List<Map<String, Object>> concentratorIds = new ArrayList<>();
         try {
-            concentratorIds = oqgHelper.OqgR(sqlConcentrator);
+            concentratorIds = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting concentrator IDs");
             throw new RuntimeException(e);
@@ -775,10 +748,10 @@ public class QueryHelper {
     }
 
     public long getConcentratorIdFromMeterSn(String meterSnStr){
-        String sqlConcentrator = "select concentrator_id from meter where meter_sn = '" + meterSnStr + "'";
+        String sql = "select concentrator_id from meter where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> concentrator = new ArrayList<>();
         try {
-            concentrator = oqgHelper.OqgR(sqlConcentrator);
+            concentrator = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting concentrator_id for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -794,7 +767,7 @@ public class QueryHelper {
         String sqlConcentrator = "select id from concentrator";
         List<Map<String, Object>> concentrators = new ArrayList<>();
         try {
-            concentrators = oqgHelper.OqgR(sqlConcentrator);
+            concentrators = oqgHelper.OqgR2(sqlConcentrator, true);
         } catch (Exception e) {
             logger.info("Error getting concentrator list");
             throw new RuntimeException(e);
@@ -809,7 +782,7 @@ public class QueryHelper {
             String sqlTariff = "select offer_id, tariff_price from concentrator_tariff where concentrator_id = " + concentratorId;
             List<Map<String, Object>> tariff = new ArrayList<>();
             try {
-                tariff = oqgHelper.OqgR(sqlTariff);
+                tariff = oqgHelper.OqgR2(sqlTariff, true);
             } catch (Exception e) {
                 logger.info("Error getting tariff for concentratorId: " + concentratorId);
                 throw new RuntimeException(e);
@@ -825,12 +798,12 @@ public class QueryHelper {
         return concentratorTariff;
     }
     public Map<String, Object> getMeterTariffFromSn(String meterSnStr){
-        String sqlMeterTariff = "select tariff_price from concentrator_tariff " +
+        String sql = "select tariff_price from concentrator_tariff " +
                 " inner join meter on meter.concentrator_id = concentrator_tariff.concentrator_id " +
                 " where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> meterTariff = new ArrayList<>();
         try {
-            meterTariff = oqgHelper.OqgR(sqlMeterTariff);
+            meterTariff = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting tariff for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -845,7 +818,7 @@ public class QueryHelper {
         String sql = "select id from meter where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> meter = new ArrayList<>();
         try {
-            meter = oqgHelper.OqgR(sql);
+            meter = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting meter for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -857,11 +830,11 @@ public class QueryHelper {
         if(tableName == null || tableName.isBlank()){
             tableName = "meter_tariff";
         }
-        String sqlMeterCredit = "select tariff_timestamp from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
+        String sql = "select tariff_timestamp from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
                 " and ref_bal_tag = 'ref_bal_epoch' order by id desc limit 1";
         List<Map<String, Object>> meterCredit = new ArrayList<>();
         try {
-            meterCredit = oqgHelper.OqgR(sqlMeterCredit);
+            meterCredit = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting credit for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -882,7 +855,7 @@ public class QueryHelper {
                 " and kiv_start_timestamp > timestamp '" + sgNow + "' - interval '72 hours' "
                 + " order by kiv_start_timestamp desc";
         try {
-            meterKiv = oqgHelper.OqgR(sql);
+            meterKiv = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -917,7 +890,7 @@ public class QueryHelper {
                 "' and session_id = '" + sessionId + "'";
         List<Map<String, Object>> meterKiv = new ArrayList<>();
         try {
-            meterKiv = oqgHelper.OqgR(sqlCheck);
+            meterKiv = oqgHelper.OqgR2(sqlCheck, true);
         } catch (Exception e) {
             logger.info("Error getting meterKiv for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -989,7 +962,7 @@ public class QueryHelper {
                 "' and session_id = '" + sessionId + "'";
         List<Map<String, Object>> meterKiv = new ArrayList<>();
         try {
-            meterKiv = oqgHelper.OqgR(sqlCheck);
+            meterKiv = oqgHelper.OqgR2(sqlCheck, true);
         } catch (Exception e) {
             logger.info("Error getting meterKiv for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -1065,7 +1038,7 @@ public class QueryHelper {
                 "' and session_id = '" + sessionId + "'";
         List<Map<String, Object>> meterKiv = new ArrayList<>();
         try {
-            meterKiv = oqgHelper.OqgR(sqlCheck);
+            meterKiv = oqgHelper.OqgR2(sqlCheck, true);
         } catch (Exception e) {
             logger.info("Error getting meterKiv for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -1124,7 +1097,7 @@ public class QueryHelper {
                 " limit 8";
         List<Map<String, Object>> intervals = new ArrayList<>();
         try {
-            intervals = oqgHelper.OqgR(sql);
+            intervals = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting meter tariff for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -1223,7 +1196,7 @@ public class QueryHelper {
                 " postal_code = '" + postalCode + "'";
         List<Map<String, Object>> premises = new ArrayList<>();
         try {
-            premises = oqgHelper.OqgR(sel);
+            premises = oqgHelper.OqgR2(sel, true);
         } catch (Exception e) {
             logger.info("Error getting premise for address info: " + building + " " + block + " " + level + " " + postalCode);
             throw new RuntimeException(e);
@@ -1277,7 +1250,7 @@ public class QueryHelper {
         String sql = "SELECT DISTINCT building_identifier, building, block, postal_code FROM premise WHERE scope_str Like '%" + scope + "%'";
         List<Map<String, Object>> buildings = new ArrayList<>();
         try {
-            buildings = oqgHelper.OqgR(sql);
+            buildings = oqgHelper.OqgR2(sql, true);
         }catch (Exception e){
             logger.info("oqgHelper error: "+e.getMessage());
             return Map.of("error", e.getMessage());
@@ -1293,7 +1266,7 @@ public class QueryHelper {
                 " mms_building = '" + mmsBuilding + "' AND mms_block = '" + mmsBlk + "'";
         List<Map<String, Object>> meters = new ArrayList<>();
         try {
-            meters = oqgHelper.OqgR(sql);
+            meters = oqgHelper.OqgR2(sql, true);
         }catch (Exception e){
             logger.info("oqgHelper error: "+e.getMessage());
         }
@@ -1322,7 +1295,7 @@ public class QueryHelper {
         String sql = "select * from meter_bypass_policy where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> bypassPolicy = new ArrayList<>();
         try {
-            bypassPolicy = oqgHelper.OqgR(sql);
+            bypassPolicy = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting bypass policy for meterSn: " + meterSnStr);
             throw new RuntimeException(e);
@@ -1376,7 +1349,7 @@ public class QueryHelper {
                 " order by tariff_timestamp desc ";
         List<Map<String, Object>> bypasses = new ArrayList<>();
         try {
-            bypasses = oqgHelper.OqgR(sql);
+            bypasses = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting bypass for meterSn: " + meterSnStr);
             return Collections.singletonMap("error", "Error getting bypass for meterSn: " + meterSnStr);
@@ -1404,7 +1377,7 @@ public class QueryHelper {
         sql.delete(sql.length()-11, sql.length());
         List<Map<String, Object>> resp = new ArrayList<>();
         try {
-            resp = oqgHelper.OqgR(sql.toString());
+            resp = oqgHelper.OqgR2(sql.toString(), true);
         } catch (Exception e) {
             logger.info("Error getting bypass for meterSn: " + meterSnStr);
             return Collections.singletonMap("error", "Error getting bypass for meterSn: " + meterSnStr);
@@ -1441,7 +1414,7 @@ public class QueryHelper {
                     " and kwh_timestamp = '" + toTimestamp + "'";
             List<Map<String, Object>> resp1 = new ArrayList<>();
             try {
-                resp1 = oqgHelper.OqgR(sql1);
+                resp1 = oqgHelper.OqgR2(sql1, true);
             } catch (Exception e) {
                 logger.info("Error getting bypass for meterSn: " + meterSnStr + "in meter_reading_daily");
                 continue;
@@ -1462,7 +1435,7 @@ public class QueryHelper {
                     " and tariff_timestamp <= '" + toTimestamp + "'";
             List<Map<String, Object>> resp2 = new ArrayList<>();
             try {
-                resp2 = oqgHelper.OqgR(slotSql);
+                resp2 = oqgHelper.OqgR2(slotSql, true);
             } catch (Exception e) {
                 logger.info("Error getting bypass for meterSn: " + meterSnStr + "in meter_tariff");
                 continue;
