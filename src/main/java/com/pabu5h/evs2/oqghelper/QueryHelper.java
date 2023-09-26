@@ -152,7 +152,7 @@ public class QueryHelper {
         if(resp.isEmpty()){
             return Map.of("info", "concentrator not found");
         }
-        return Map.of("concentrator_id_list", resp.stream().map(meter -> meter.get("concentrator_id")).toList());
+        return Map.of("concentrator_id_list", resp.stream().map(meter -> meter.get("id")).toList());
     }
     public Map<String, Object> getConcs(String projectScope){
         String sql = "select DISTINCT concentrator_id from meter";
