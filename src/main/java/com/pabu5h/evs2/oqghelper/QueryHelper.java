@@ -140,6 +140,20 @@ public class QueryHelper {
         }
         return meterInfo.get(0);
     }
+    public Map<String, Object> getAllConcIds(){
+        String sql = "select concentrator_id from concentrator";
+
+        List<Map<String, Object>> resp = new ArrayList<>();
+        try {
+            resp = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(resp.isEmpty()){
+            return Map.of("info", "concentrator not found");
+        }
+        return Map.of("concentrator_id_list", resp.stream().map(meter -> meter.get("concentrator_id")).toList());
+    }
     public Map<String, Object> getConcs(String projectScope){
         String sql = "select DISTINCT concentrator_id from meter";
         if(projectScope != null && !projectScope.isEmpty()){
