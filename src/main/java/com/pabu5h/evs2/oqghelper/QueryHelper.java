@@ -141,7 +141,7 @@ public class QueryHelper {
         return meterInfo.get(0);
     }
     public Map<String, Object> getAllConcIds(){
-        String sql = "select concentrator_id from concentrator";
+        String sql = "select id from concentrator";
 
         List<Map<String, Object>> resp = new ArrayList<>();
         try {
