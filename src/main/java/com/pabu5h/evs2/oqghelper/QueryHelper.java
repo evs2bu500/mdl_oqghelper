@@ -1305,8 +1305,12 @@ public class QueryHelper {
         }
     }
 
-    public Map<String, Object> getMeterEffectiveBypassPolicy(String meterSnStr){
-        String sql = "select * from meter_bypass_policy where meter_sn = '" + meterSnStr + "'";
+    public Map<String, Object> getMeterEffectiveBypassPolicy(String meterSnStr, String bypassPolicyTableName){
+        String tableName = bypassPolicyTableName;
+        if(bypassPolicyTableName == null || bypassPolicyTableName.isBlank()){
+            tableName = "bypass_policy";
+        }
+        String sql = "select * from "+tableName+" where meter_sn = '" + meterSnStr + "'";
         List<Map<String, Object>> bypassPolicy = new ArrayList<>();
         try {
             bypassPolicy = oqgHelper.OqgR2(sql, true);
