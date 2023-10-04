@@ -111,6 +111,40 @@ public class QueryHelper {
 
         return Map.of("meter_info", meterInfoDto);
     }
+    public Map<String, Object> getMeterInfoDtoFromSn2(String meterSnStr, String bypassPolicyTableName){
+        String sql = "select * from meter where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.isEmpty()){
+            return Map.of("info", "meter not found");
+        }
+        Map<String, Object> meterInfoMap = meterInfo.get(0);
+        MeterInfoDto meterInfoDto = MeterInfoDto.fromFieldMap(meterInfoMap);
+
+        if(bypassPolicyTableName != null && !bypassPolicyTableName.isEmpty()){
+            String bypassSql = "select * from " +bypassPolicyTableName+ " where meter_sn = '" + meterSnStr + "'";
+            List<Map<String, Object>> bypassInfo = new ArrayList<>();
+            try {
+                bypassInfo = oqgHelper.OqgR2(bypassSql, false);
+            } catch (Exception e) {
+//                throw new RuntimeException(e);
+                logger.info("Error getting bypass policy for meter: " + meterSnStr);
+                return Map.of("error", "Error getting bypass policy for meter: " + meterSnStr);
+            }
+            if(!bypassInfo.isEmpty()){
+                Map<String, Object> meterBypassInfoMap = bypassInfo.get(0);
+                MeterBypassDto meterBypassDto = MeterBypassDto.fromFieldMap(meterBypassInfoMap);
+                meterInfoDto.setBypassPolicy(meterBypassDto);
+            }
+        }
+
+        return Map.of("meter_info", meterInfoDto);
+    }
+
     public Map<String, Object> getMeterInfoDtoFromDisplayname(String meterDisplayname){
         String sql = "select * from meter where meter_displayname = '" + meterDisplayname + "'";
         List<Map<String, Object>> meterInfo = new ArrayList<>();
@@ -1304,7 +1338,6 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
     }
-
     public Map<String, Object> getMeterEffectiveBypassPolicy(String meterSnStr, String bypassPolicyTableName){
         String tableName = bypassPolicyTableName;
         if(bypassPolicyTableName == null || bypassPolicyTableName.isBlank()){
