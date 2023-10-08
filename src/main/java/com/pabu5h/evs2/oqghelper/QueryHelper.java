@@ -216,12 +216,27 @@ public class QueryHelper {
         return Map.of("concentrator_list", meterInfo.stream().map(meter -> meter.get("concentrator_id")).toList());
     }
 
-    public Map<String, Object> getMmsBuildings(String projectScope){
+    public Map<String, Object> getMmsBuildings(String projectScope, String siteScope){
         String sql = "select DISTINCT mms_building from meter";
+//        if(projectScope != null && !projectScope.isEmpty()){
+//            sql = "select DISTINCT mms_building from meter where scope_str LIKE '%" + projectScope + "%'" +
+//            " ORDER BY mms_building ASC";
+//        }
+        Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = "select DISTINCT mms_building from meter where scope_str LIKE '%" + projectScope + "%'" +
-            " ORDER BY mms_building ASC";
+            likeTargets.put("scope_str", projectScope);
         }
+        if(siteScope != null && !siteScope.isEmpty()){
+            likeTargets.put("site_tag", siteScope);
+        }
+        Map<String, String> sqlResult = SqlUtil.makeSelectSql2(
+                Map.of("from", "meter",
+                        "select",
+                        "DISTINCT mms_building",
+                        "like_targets", likeTargets
+                ));
+        sql = sqlResult.get("sql");
+        sql = sql + " ORDER BY mms_building ASC";
 
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
@@ -235,15 +250,33 @@ public class QueryHelper {
         return Map.of("building_list", meterInfo.stream().map(meter -> meter.get("mms_building")).toList());
     }
 
-    public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope){
-        String sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "'" +
+    public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope, String siteScope){
+        String sql = "select DISTINCT mms_block from meter where " +
+                " mms_building = '" + building + "'" +
                 " ORDER BY mms_block ASC";
+//        if(projectScope != null && !projectScope.isEmpty()){
+//            // syntax error
+////            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+//            sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "' and scope_str LIKE '%" + projectScope + "%'" +
+//                    " ORDER BY mms_block ASC";
+//        }
+        Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
-            // syntax error
-//            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
-            sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "' and scope_str LIKE '%" + projectScope + "%'" +
-                    " ORDER BY mms_block ASC";
+            likeTargets.put("scope_str", projectScope);
         }
+        if(siteScope != null && !siteScope.isEmpty()){
+            likeTargets.put("site_tag", siteScope);
+        }
+        Map<String, String> sqlResult = SqlUtil.makeSelectSql2(
+                Map.of("from", "meter",
+                        "select",
+                        "DISTINCT mms_block",
+                        "targets", Map.of("mms_building", building),
+                        "like_targets", likeTargets
+                ));
+        sql = sqlResult.get("sql");
+        sql = sql + " ORDER BY mms_block ASC";
+
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR2(sql, true);
@@ -256,15 +289,32 @@ public class QueryHelper {
         return Map.of("block_list", meterInfo.stream().map(meter -> meter.get("mms_block")).toList());
     }
 
-    public Map<String, Object> getMmsLevels (String building, String block, String projectScope){
+    public Map<String, Object> getMmsLevels (String building, String block, String projectScope, String siteScope){
         String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'"
                 + " ORDER BY mms_level ASC";
+//        if(projectScope != null && !projectScope.isEmpty()){
+//            // syntax error
+////            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+//            sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and scope_str LIKE '%" + projectScope + "%'"
+//                    + " ORDER BY mms_level ASC";
+//        }
+        Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
-            // syntax error
-//            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
-            sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and scope_str LIKE '%" + projectScope + "%'"
-                    + " ORDER BY mms_level ASC";
+            likeTargets.put("scope_str", projectScope);
         }
+        if(siteScope != null && !siteScope.isEmpty()){
+            likeTargets.put("site_tag", siteScope);
+        }
+        Map<String, String> sqlResult = SqlUtil.makeSelectSql2(
+                Map.of("from", "meter",
+                        "select",
+                        "DISTINCT mms_level",
+                        "targets", Map.of("mms_building", building, "mms_block", block),
+                        "like_targets", likeTargets
+                ));
+        sql = sqlResult.get("sql");
+        sql = sql + " ORDER BY mms_level ASC";
+
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR2(sql, true);
@@ -276,16 +326,33 @@ public class QueryHelper {
         }
         return Map.of("level_list", meterInfo.stream().map(meter -> meter.get("mms_level")).toList());
     }
-    public Map<String, Object> getMmsUnits (String building, String block, String level, String projectScope){
+    public Map<String, Object> getMmsUnits (String building, String block, String level, String projectScope, String siteScope){
         String sql = "select DISTINCT mms_unit from meter where mms_building = '" + building + "' and mms_block = '" + block + "'" +
                 " and mms_level = '" + level + "'"
                 + " ORDER BY mms_unit ASC";
+//        if(projectScope != null && !projectScope.isEmpty()){
+//            // syntax error
+////            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
+//            sql = "select DISTINCT mms_unit from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and mms_level = '" + level + "' and scope_str LIKE '%" + projectScope + "%'"
+//                    + " ORDER BY mms_unit ASC";
+//        }
+        Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
-            // syntax error
-//            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
-            sql = "select DISTINCT mms_unit from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and mms_level = '" + level + "' and scope_str LIKE '%" + projectScope + "%'"
-                    + " ORDER BY mms_unit ASC";
+            likeTargets.put("scope_str", projectScope);
         }
+        if(siteScope != null && !siteScope.isEmpty()){
+            likeTargets.put("site_tag", siteScope);
+        }
+        Map<String, String> sqlResult = SqlUtil.makeSelectSql2(
+                Map.of("from", "meter",
+                        "select",
+                        "DISTINCT mms_unit",
+                        "targets", Map.of("mms_building", building, "mms_block", block, "mms_level", level),
+                        "like_targets", likeTargets
+                ));
+        sql = sqlResult.get("sql");
+        sql = sql + " ORDER BY mms_unit ASC";
+
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
             meterInfo = oqgHelper.OqgR2(sql, true);
