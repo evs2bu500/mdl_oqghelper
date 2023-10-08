@@ -6,7 +6,6 @@ import com.xt.utils.DateTimeUtil;
 import com.xt.utils.MathUtil;
 import com.xt.utils.SqlUtil;
 
-import jdk.jshell.execution.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
-import static java.util.Collections.singletonMap;
 
 @Service
 public class QueryHelper {
@@ -188,12 +185,24 @@ public class QueryHelper {
         }
         return Map.of("concentrator_id_list", resp.stream().map(meter -> meter.get("id")).toList());
     }
-    public Map<String, Object> getConcs(String projectScope){
+    public Map<String, Object> getCons(String projectScope, String siteScope){
         String sql = "select DISTINCT concentrator_id from meter";
+        Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
-            sql = "select DISTINCT concentrator_id from meter where scope_str LIKE '%" + projectScope + "%'"
-            + " ORDER BY concentrator_id ASC";
+            likeTargets.put("scope_str", projectScope);
         }
+        if(siteScope != null && !siteScope.isEmpty()){
+            likeTargets.put("site_tag", siteScope);
+        }
+        Map<String, String> sqlResult = SqlUtil.makeSelectSql2(
+                Map.of("from", "meter",
+                        "select",
+                        "DISTINCT concentrator_id",
+                        "like_targets", likeTargets
+                ));
+
+        sql = sqlResult.get("sql");
+        sql = sql + " ORDER BY concentrator_id ASC";
 
         List<Map<String, Object>> meterInfo = new ArrayList<>();
         try {
@@ -206,6 +215,7 @@ public class QueryHelper {
         }
         return Map.of("concentrator_list", meterInfo.stream().map(meter -> meter.get("concentrator_id")).toList());
     }
+
     public Map<String, Object> getMmsBuildings(String projectScope){
         String sql = "select DISTINCT mms_building from meter";
         if(projectScope != null && !projectScope.isEmpty()){
