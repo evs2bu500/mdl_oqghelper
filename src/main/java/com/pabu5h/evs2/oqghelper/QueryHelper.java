@@ -540,13 +540,44 @@ public class QueryHelper {
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
     }
 
-    public double getAllActiveKwhConsumption(){
+    //get total kwh consumption for a list of meters in a scope for the past 24 hours
+    public Map<String, Object> getAllActiveKwhConsumption(String localNow, Map<String, String> scope){
         List<Map<String, Object>> kwhConsumption = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+//        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+
+        String meterSnInStr = "";
+        if(scope != null && !scope.isEmpty()){
+            String scopeConstraint = "";
+            //priority: site > project
+            if(scope.containsKey("site_scope")){
+                scopeConstraint = " site_tag = '" + scope.get("site_tag") + "' ";
+            }else if(scope.containsKey("project_scope")){
+                scopeConstraint = " scope_str ilike '%" + scope.get("scope_str") + "%' ";
+            }
+            if(!scopeConstraint.isEmpty()){
+                //get meterSn within the scope
+                String sql = "select meter_sn from meter where " + scopeConstraint;
+                List<Map<String, Object>> meterSns = new ArrayList<>();
+                try {
+                    meterSns = oqgHelper.OqgR2(sql, true);
+                } catch (Exception e) {
+                    logger.info("Error getting meterSn within scope: " + scopeConstraint);
+                    return Map.of("error", "Error getting meterSn within scope: " + scopeConstraint);
+                }
+
+                if(!meterSns.isEmpty()){
+                    //build a 'in' string for sql
+                    meterSnInStr = meterSns.stream().map(meter -> "'" + meter.get("meter_sn") + "'").collect(Collectors.joining(","));
+                    meterSnInStr = " and in (" + meterSnInStr + ")";
+                }
+            }
+        }
+
         String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
                 " where kwh_diff is not null " +
-                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+                " and tariff_timestamp > timestamp '" + localNow + "' - interval '24 hours' "
+                + meterSnInStr;
 
         try {
             kwhConsumption = oqgHelper.OqgR2(sql, true);
@@ -554,13 +585,14 @@ public class QueryHelper {
             throw new RuntimeException(e);
         }
         if(kwhConsumption.isEmpty()){
-            return 0;
+            return Collections.singletonMap("info", "no data");
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
         if(kwhConsumption.get(0).get("kwh_total") == null){
-            return 0;
+            return Collections.singletonMap("info", "no data");
         }
-        return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
+        double kwhTotal = Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
+        return Collections.singletonMap("active_kwh_consumption", kwhTotal);
     }
 
     public double getAllRecentCommData(){
