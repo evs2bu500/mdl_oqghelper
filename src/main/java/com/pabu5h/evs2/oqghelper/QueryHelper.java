@@ -534,7 +534,7 @@ public class QueryHelper {
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
-        if(kwhConsumption.get(0).get("kwh_total") == null){
+        if(kwhConsumption.get(0).get("total_kwh") == null){
             return 0;
         }
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
