@@ -763,6 +763,7 @@ public class QueryHelper {
                     .append(" <= TIMESTAMP '")
                     .append(localNowOffsetStr)
                     .append("'")
+                    .append(" and meter_displayname not like 'pi%' ")
                     .append(meterDisplaynameInStr);
 
             // Add a UNION ALL between each statement except the last one
