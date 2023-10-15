@@ -550,9 +550,9 @@ public class QueryHelper {
         if(scope != null && !scope.isEmpty()){
             String scopeConstraint = "";
             //priority: site > project
-            if(scope.containsKey("site_scope")){
+            if(scope.containsKey("site_tag")){
                 scopeConstraint = " site_tag = '" + scope.get("site_tag") + "' ";
-            }else if(scope.containsKey("project_scope")){
+            }else if(scope.containsKey("scope_str")){
                 scopeConstraint = " scope_str ilike '%" + scope.get("scope_str") + "%' ";
             }
             if(!scopeConstraint.isEmpty()){
