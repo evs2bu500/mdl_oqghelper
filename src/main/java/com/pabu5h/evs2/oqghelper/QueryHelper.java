@@ -540,12 +540,7 @@ public class QueryHelper {
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
     }
 
-    //get total kwh consumption for a list of meters in a scope for the past 24 hours
-    public Map<String, Object> getAllActiveKwhConsumption(String localNow, Map<String, String> scope){
-        List<Map<String, Object>> kwhConsumption = new ArrayList<>();
-
-//        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
-
+    public Map<String, Object> getScopeConstraint(Map<String, String>scope){
         String meterSnInStr = "";
         if(scope != null && !scope.isEmpty()){
             String scopeConstraint = "";
@@ -573,6 +568,47 @@ public class QueryHelper {
                 }
             }
         }
+        return Map.of("scope_constraint", meterSnInStr);
+    }
+
+    //get total kwh consumption for a list of meters in a scope for the past 24 hours
+    public Map<String, Object> getAllActiveKwhConsumption(String localNow, Map<String, String> scope){
+        List<Map<String, Object>> kwhConsumption = new ArrayList<>();
+
+//        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+
+//        String meterSnInStr = "";
+//        if(scope != null && !scope.isEmpty()){
+//            String scopeConstraint = "";
+//            //priority: site > project
+//            if(scope.containsKey("site_tag")){
+//                scopeConstraint = " site_tag = '" + scope.get("site_tag") + "' ";
+//            }else if(scope.containsKey("scope_str")){
+//                scopeConstraint = " scope_str ilike '%" + scope.get("scope_str") + "%' ";
+//            }
+//            if(!scopeConstraint.isEmpty()){
+//                //get meterSn within the scope
+//                String sql = "select meter_sn from meter where " + scopeConstraint;
+//                List<Map<String, Object>> meterSns = new ArrayList<>();
+//                try {
+//                    meterSns = oqgHelper.OqgR2(sql, true);
+//                } catch (Exception e) {
+//                    logger.info("Error getting meterSn within scope: " + scopeConstraint);
+//                    return Map.of("error", "Error getting meterSn within scope: " + scopeConstraint);
+//                }
+//
+//                if(!meterSns.isEmpty()){
+//                    //build a 'in' string for sql
+//                    meterSnInStr = meterSns.stream().map(meter -> "'" + meter.get("meter_sn") + "'").collect(Collectors.joining(","));
+//                    meterSnInStr = " and meter_sn in (" + meterSnInStr + ")";
+//                }
+//            }
+//        }
+        Map<String, Object> scopeConstraint = getScopeConstraint(scope);
+        if (scopeConstraint.containsKey("error")){
+            return scopeConstraint;
+        }
+        String meterSnInStr = scopeConstraint.get("scope_constraint").toString();
 
         String sql = "select sum(kwh_diff) as kwh_total from meter_tariff " +
                 " where kwh_diff is not null " +
