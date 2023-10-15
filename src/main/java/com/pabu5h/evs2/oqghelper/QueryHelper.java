@@ -720,7 +720,7 @@ public class QueryHelper {
         return Collections.singletonMap(labelAs, totalTopup);
     }
 
-    public Map<String, Object> getTotalTopupHistory(int days, String localNow, Map<String, String> scope){
+    public Map<String, Object> getTotalTopupHistory(int days, LocalDateTime localNow, Map<String, String> scope){
         String tableName = "transaction_log";
         String timeKey = "transaction_log_timestamp";
         String labelAs = "total_topup";
@@ -735,10 +735,12 @@ public class QueryHelper {
         // Iterate over the past n days
         for (int i = 0; i < days; i++) {
             // Subtract i days from the current date
+            LocalDateTime localNowOffset = localNow.minusDays(i);
+            String localNowOffsetStr = DateTimeUtil.getLocalDateTimeStr(localNowOffset);
 
             // Append the SQL statement for each day to the query builder
             queryBuilder.append("SELECT '")
-                    .append(localNow).append("' AS timestamp, sum(topup_amt) as ").append(labelAs).append(" FROM ")
+                    .append(localNowOffsetStr).append("' AS timestamp, sum(topup_amt) as ").append(labelAs).append(" FROM ")
                     .append(tableName)
                     .append(" WHERE ")
                     .append(" topup_amt is not null ")
@@ -747,12 +749,12 @@ public class QueryHelper {
                     .append(" and ")
                     .append(timeKey)
                     .append(" > TIMESTAMP '")
-                    .append(localNow)
+                    .append(localNowOffsetStr)
                     .append("' - INTERVAL '24 hours'")
                     .append(" AND ")
                     .append(timeKey)
                     .append(" <= TIMESTAMP '")
-                    .append(localNow)
+                    .append(localNowOffsetStr)
                     .append("'")
                     .append(meterDisplaynameInStr);
 
