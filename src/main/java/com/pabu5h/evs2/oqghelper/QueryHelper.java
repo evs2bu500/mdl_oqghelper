@@ -569,7 +569,7 @@ public class QueryHelper {
                 if(!meterSns.isEmpty()){
                     //build a 'in' string for sql
                     meterSnInStr = meterSns.stream().map(meter -> "'" + meter.get("meter_sn") + "'").collect(Collectors.joining(","));
-                    meterSnInStr = " and in (" + meterSnInStr + ")";
+                    meterSnInStr = " meter_sn and in (" + meterSnInStr + ")";
                 }
             }
         }
