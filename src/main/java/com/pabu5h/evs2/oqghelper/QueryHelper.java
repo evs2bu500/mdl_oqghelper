@@ -685,6 +685,7 @@ public class QueryHelper {
     }
     public Map<String, Object> getAllTopupAmount(String localNow, Map<String, String> scope){
         List<Map<String, Object>>topupTotal = new ArrayList<>();
+        String labelAs = "total_topup";
 
         Map<String, Object> scopeConstraint = getScopeConstraint(scope, "meter_displayname");
         if (scopeConstraint.containsKey("error")){
@@ -696,7 +697,8 @@ public class QueryHelper {
 //        String sql = "select sum(credit_amt) as credit_total from meter_tariff " +
 //                " where credit_amt is not null " +
 //                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
-        String sql = "select sum(topup_amt) as total_topup from transaction_log " +
+
+        String sql = "select sum(topup_amt) as "+labelAs+" from transaction_log " +
                 " where topup_amt is not null " +
                 " and transaction_status = 3 " +
                 " and payment_mode != 4" +
@@ -711,11 +713,11 @@ public class QueryHelper {
             return Collections.singletonMap("info", "no data");
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
-        if(topupTotal.get(0).get("total_topup") == null){
+        if(topupTotal.get(0).get(labelAs) == null){
             return Collections.singletonMap("info", "no data");
         }
-        double totalTopup = Double.parseDouble(topupTotal.get(0).get("topup_total").toString());
-        return Collections.singletonMap("total_topup", totalTopup);
+        double totalTopup = Double.parseDouble(topupTotal.get(0).get(labelAs).toString());
+        return Collections.singletonMap(labelAs, totalTopup);
     }
 
     public Map<String, Object> getTotalTopupHistory(int days){
