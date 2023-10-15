@@ -630,35 +630,41 @@ public class QueryHelper {
         return Double.parseDouble(dataConsumption.get(0).get("data_total").toString());
     }
 
-    public Map<String, Object> getAllActiveKwhConsumptionHistory(int days){
+    public Map<String, Object> getAllActiveKwhConsumptionHistory(int days, LocalDateTime localNow, Map<String, String> scope){
 
         String tableName = "meter_tariff";
         String timeKey = "tariff_timestamp";
-        // Create a StringBuilder to build the SQL query
+        String labelAs = "total_kwh";
+
+        Map<String, Object> scopeConstraint = getScopeConstraint(scope, "meter_sn");
+        if (scopeConstraint.containsKey("error")){
+            return scopeConstraint;
+        }
+        String meterSnInStr = scopeConstraint.get("scope_constraint").toString();
+
         StringBuilder queryBuilder = new StringBuilder();
 
         // Iterate over the past 7 days
         for (int i = 0; i < days; i++) {
             // Subtract i days from the current date
-            LocalDateTime sgNow =
-                    DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now().minusDays(i), ZoneId.of("Asia/Singapore"));
-            String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
+            LocalDateTime localNowOffset = localNow.minusDays(i);
+            String localNowOffsetStr = DateTimeUtil.getLocalDateTimeStr(localNowOffset);
 
             // Append the SQL statement for each day to the query builder
             queryBuilder.append("SELECT '")
-                    .append(sgNowStr)
-                    .append("' AS timestamp, sum(kwh_diff) as kwh_total FROM ")
+                    .append(localNowOffsetStr).append("' AS timestamp, sum(kwh_diff) as ").append(labelAs).append(" FROM ")
                     .append(tableName)
                     .append(" WHERE ")
                     .append(timeKey)
                     .append(" > TIMESTAMP '")
-                    .append(sgNowStr)
+                    .append(localNowOffsetStr)
                     .append("' - INTERVAL '24 hours'")
                     .append(" AND ")
                     .append(timeKey)
                     .append(" <= TIMESTAMP '")
-                    .append(sgNowStr)
-                    .append("'");
+                    .append(localNowOffsetStr)
+                    .append("'")
+                    .append(meterSnInStr);
 
             // Add a UNION ALL between each statement except the last one
             if (i < days - 1) {
