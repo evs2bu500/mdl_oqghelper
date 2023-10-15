@@ -708,7 +708,8 @@ public class QueryHelper {
                 " where topup_amt is not null " +
                 " and transaction_status = 3 " +
                 " and payment_mode != 4" +
-                " and transaction_log_timestamp > timestamp '" + localNow + "' - interval '24 hours' "
+                " and transaction_log_timestamp > timestamp '" + localNow + "' - interval '24 hours' " +
+                " and meter_displayname not like 'pi%' "
                 + meterDisplaynameInStr;
         try {
             topupTotal = oqgHelper.OqgR2(sql, true);
