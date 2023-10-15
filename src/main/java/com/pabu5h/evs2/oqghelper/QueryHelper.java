@@ -720,24 +720,25 @@ public class QueryHelper {
         return Collections.singletonMap(labelAs, totalTopup);
     }
 
-    public Map<String, Object> getTotalTopupHistory(int days){
-
+    public Map<String, Object> getTotalTopupHistory(int days, String localNow, Map<String, String> scope){
         String tableName = "transaction_log";
-        String timeKey = "response_timestamp";
-        // Create a StringBuilder to build the SQL query
-        StringBuilder queryBuilder = new StringBuilder();
+        String timeKey = "transaction_log_timestamp";
+        String labelAs = "total_topup";
 
+        Map<String, Object> scopeConstraint = getScopeConstraint(scope, "meter_displayname");
+        if (scopeConstraint.containsKey("error")){
+            return scopeConstraint;
+        }
+        String meterDisplaynameInStr = scopeConstraint.get("scope_constraint").toString();
+
+        StringBuilder queryBuilder = new StringBuilder();
         // Iterate over the past n days
         for (int i = 0; i < days; i++) {
             // Subtract i days from the current date
-            LocalDateTime sgNow =
-                    DateTimeUtil.getZonedLocalDateTimeFromSystemLocalDateTime(now().minusDays(i), ZoneId.of("Asia/Singapore"));
-            String sgNowStr = DateTimeUtil.getLocalDateTimeStr(sgNow);
 
             // Append the SQL statement for each day to the query builder
             queryBuilder.append("SELECT '")
-                    .append(sgNowStr)
-                    .append("' AS timestamp, sum(topup_amt) as topup_total FROM ")
+                    .append(localNow).append("' AS timestamp, sum(topup_amt) as ").append(labelAs).append(" FROM ")
                     .append(tableName)
                     .append(" WHERE ")
                     .append(" topup_amt is not null ")
@@ -746,13 +747,14 @@ public class QueryHelper {
                     .append(" and ")
                     .append(timeKey)
                     .append(" > TIMESTAMP '")
-                    .append(sgNowStr)
+                    .append(localNow)
                     .append("' - INTERVAL '24 hours'")
                     .append(" AND ")
                     .append(timeKey)
                     .append(" <= TIMESTAMP '")
-                    .append(sgNowStr)
-                    .append("'");
+                    .append(localNow)
+                    .append("'")
+                    .append(meterDisplaynameInStr);
 
             // Add a UNION ALL between each statement except the last one
             if (i < days - 1) {
