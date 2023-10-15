@@ -541,6 +541,10 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getScopeConstraint(Map<String, String>scope, String meterIdColName){
+        if(scope == null || scope.isEmpty()){
+            return Map.of("scope_constraint", "");
+        }
+
         String meterIdInStr = "";
         if(scope != null && !scope.isEmpty()){
             String scopeConstraint = "";
