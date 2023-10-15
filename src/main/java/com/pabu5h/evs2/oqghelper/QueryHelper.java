@@ -540,8 +540,8 @@ public class QueryHelper {
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
     }
 
-    public Map<String, Object> getScopeConstraint(Map<String, String>scope){
-        String meterSnInStr = "";
+    public Map<String, Object> getScopeConstraint(Map<String, String>scope, String meterIdColName){
+        String meterIdInStr = "";
         if(scope != null && !scope.isEmpty()){
             String scopeConstraint = "";
             //priority: site > project
@@ -552,59 +552,30 @@ public class QueryHelper {
             }
             if(!scopeConstraint.isEmpty()){
                 //get meterSn within the scope
-                String sql = "select meter_sn from meter where " + scopeConstraint;
-                List<Map<String, Object>> meterSns = new ArrayList<>();
+                String sql = "select " +meterIdColName+ " from meter where " + scopeConstraint;
+                List<Map<String, Object>> meterIds = new ArrayList<>();
                 try {
-                    meterSns = oqgHelper.OqgR2(sql, true);
+                    meterIds = oqgHelper.OqgR2(sql, true);
                 } catch (Exception e) {
-                    logger.info("Error getting meterSn within scope: " + scopeConstraint);
-                    return Map.of("error", "Error getting meterSn within scope: " + scopeConstraint);
+                    logger.info("Error getting "+meterIdColName+" within scope: " + scopeConstraint);
+                    return Map.of("error", "Error getting "+meterIdColName+" within scope: " + scopeConstraint);
                 }
 
-                if(!meterSns.isEmpty()){
+                if(!meterIds.isEmpty()){
                     //build a 'in' string for sql
-                    meterSnInStr = meterSns.stream().map(meter -> "'" + meter.get("meter_sn") + "'").collect(Collectors.joining(","));
-                    meterSnInStr = " and meter_sn in (" + meterSnInStr + ")";
+                    meterIdInStr = meterIds.stream().map(meter -> "'" + meter.get(meterIdColName) + "'").collect(Collectors.joining(","));
+                    meterIdInStr = " and "+meterIdColName+" in (" + meterIdInStr + ")";
                 }
             }
         }
-        return Map.of("scope_constraint", meterSnInStr);
+        return Map.of("scope_constraint", meterIdInStr);
     }
 
     //get total kwh consumption for a list of meters in a scope for the past 24 hours
     public Map<String, Object> getAllActiveKwhConsumption(String localNow, Map<String, String> scope){
         List<Map<String, Object>> kwhConsumption = new ArrayList<>();
 
-//        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
-
-//        String meterSnInStr = "";
-//        if(scope != null && !scope.isEmpty()){
-//            String scopeConstraint = "";
-//            //priority: site > project
-//            if(scope.containsKey("site_tag")){
-//                scopeConstraint = " site_tag = '" + scope.get("site_tag") + "' ";
-//            }else if(scope.containsKey("scope_str")){
-//                scopeConstraint = " scope_str ilike '%" + scope.get("scope_str") + "%' ";
-//            }
-//            if(!scopeConstraint.isEmpty()){
-//                //get meterSn within the scope
-//                String sql = "select meter_sn from meter where " + scopeConstraint;
-//                List<Map<String, Object>> meterSns = new ArrayList<>();
-//                try {
-//                    meterSns = oqgHelper.OqgR2(sql, true);
-//                } catch (Exception e) {
-//                    logger.info("Error getting meterSn within scope: " + scopeConstraint);
-//                    return Map.of("error", "Error getting meterSn within scope: " + scopeConstraint);
-//                }
-//
-//                if(!meterSns.isEmpty()){
-//                    //build a 'in' string for sql
-//                    meterSnInStr = meterSns.stream().map(meter -> "'" + meter.get("meter_sn") + "'").collect(Collectors.joining(","));
-//                    meterSnInStr = " and meter_sn in (" + meterSnInStr + ")";
-//                }
-//            }
-//        }
-        Map<String, Object> scopeConstraint = getScopeConstraint(scope);
+        Map<String, Object> scopeConstraint = getScopeConstraint(scope, "meter_sn");
         if (scopeConstraint.containsKey("error")){
             return scopeConstraint;
         }
@@ -708,31 +679,39 @@ public class QueryHelper {
 
         return Collections.singletonMap("active_kwh_consumption_history", kwhConsumption);
     }
-    public double getAllTopupAmount(){
+    public Map<String, Object> getAllTopupAmount(String localNow, Map<String, String> scope){
         List<Map<String, Object>>topupTotal = new ArrayList<>();
 
-        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
+        Map<String, Object> scopeConstraint = getScopeConstraint(scope, "meter_displayname");
+        if (scopeConstraint.containsKey("error")){
+            return scopeConstraint;
+        }
+        String meterDisplaynameInStr = scopeConstraint.get("scope_constraint").toString();
+
+//        String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
 //        String sql = "select sum(credit_amt) as credit_total from meter_tariff " +
 //                " where credit_amt is not null " +
 //                " and tariff_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
-        String sql = "select sum(topup_amt) as topup_total from transaction_log " +
+        String sql = "select sum(topup_amt) as total_topup from transaction_log " +
                 " where topup_amt is not null " +
                 " and transaction_status = 3 " +
                 " and payment_mode != 4" +
-                " and response_timestamp > timestamp '" + sgNow + "' - interval '24 hours' ";
+                " and response_timestamp > timestamp '" + localNow + "' - interval '24 hours' "
+                + meterDisplaynameInStr;
         try {
             topupTotal = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         if(topupTotal.isEmpty()){
-            return 0;
+            return Collections.singletonMap("info", "no data");
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
-        if(topupTotal.get(0).get("topup_total") == null){
-            return 0;
+        if(topupTotal.get(0).get("total_topup") == null){
+            return Collections.singletonMap("info", "no data");
         }
-        return Double.parseDouble(topupTotal.get(0).get("topup_total").toString());
+        double totalTopup = Double.parseDouble(topupTotal.get(0).get("topup_total").toString());
+        return Collections.singletonMap("total_topup", totalTopup);
     }
 
     public Map<String, Object> getTotalTopupHistory(int days){
