@@ -1677,20 +1677,24 @@ public class QueryHelper {
         }
         return Map.of("bypasses", bypasses);
     }
-    public void postOpLog(String postDateTimeStr,
-                          String username,
+
+    public void postOpLog2(String postDateTimeStr,
+                          long userId,
                           String target,
                           String operation,
                           String targetSpec,
                           String opRef,
                           double opVal,
                           String remark,
+                          String refId,
                           String sessionId){
         String opsLogTable = "evs2_op_log";
 
         if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
-            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
+//            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
+            throw new RuntimeException("postDateTimeStr is null or empty");
         }
+
         if(sessionId == null || sessionId.isEmpty()) {
             sessionId = UUID.randomUUID().toString();
         }
@@ -1698,13 +1702,14 @@ public class QueryHelper {
         Map<String, Object> oplogSqlMap = Map.of("table", opsLogTable,
                 "content", Map.of(
                         "op_timestamp", postDateTimeStr,
-                        "username", username,
+                        "user_id", userId,
                         "evs2_acl_target", target,
                         "target_spec", targetSpec,
                         "evs2_acl_operation", operation,
                         "op_ref", opRef,
                         "op_val", opVal,
                         "remark", remark,
+                        "ref_id", refId,
                         "session_id", sessionId
                 ));
         Map<String, String> sqlInsert = SqlUtil.makeInsertSql(oplogSqlMap);

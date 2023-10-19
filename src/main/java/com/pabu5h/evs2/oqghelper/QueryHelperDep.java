@@ -130,4 +130,48 @@ public class QueryHelperDep {
         }
         return !meter.isEmpty();
     }
+
+    public void postOpLog(String postDateTimeStr,
+                          String username,
+                          String target,
+                          String operation,
+                          String targetSpec,
+                          String opRef,
+                          double opVal,
+                          String remark,
+                          String sessionId){
+        String opsLogTable = "evs2_op_log";
+
+        if(postDateTimeStr == null || postDateTimeStr.isEmpty()) {
+            postDateTimeStr = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));;
+        }
+        if(sessionId == null || sessionId.isEmpty()) {
+            sessionId = UUID.randomUUID().toString();
+        }
+
+        Map<String, Object> oplogSqlMap = Map.of("table", opsLogTable,
+                "content", Map.of(
+                        "op_timestamp", postDateTimeStr,
+                        "username", username,
+                        "evs2_acl_target", target,
+                        "target_spec", targetSpec,
+                        "evs2_acl_operation", operation,
+                        "op_ref", opRef,
+                        "op_val", opVal,
+                        "remark", remark,
+                        "session_id", sessionId
+                ));
+        Map<String, String> sqlInsert = SqlUtil.makeInsertSql(oplogSqlMap);
+        if(sqlInsert.get("sql")==null){
+            logger.info("Error getting insert sql for opsLogTable");
+            throw new RuntimeException("Error getting insert sql for opsLogTable");
+        }
+        try {
+            oqgHelper.OqgIU(sqlInsert.get("sql"));
+        } catch (Exception e) {
+            logger.info("Error inserting opsLogTable");
+            throw new RuntimeException(e);
+        }
+    }
+
 }
