@@ -597,6 +597,28 @@ public class QueryHelper {
 
         return Map.of("in_constraint", meterIdInStr);
     }
+    public Map<String, Object> getInConstraint2(String selectSql, String srcIdColName, String targetIdColName){
+
+        String idInStr = "";
+
+        String inConstraint = "";
+
+        List<Map<String, Object>> ids = new ArrayList<>();
+        try {
+            ids = oqgHelper.OqgR2(selectSql, true);
+        } catch (Exception e) {
+            logger.info("Error getting ids from sql: " + selectSql);
+            return Map.of("error", "Error getting ids from sql: " + selectSql);
+        }
+
+        if(!ids.isEmpty()){
+            //build a 'in' string for sql
+            idInStr = ids.stream().map(meter -> "'" + meter.get(srcIdColName) + "'").collect(Collectors.joining(","));
+            idInStr = " and "+targetIdColName+" in (" + idInStr + ")";
+        }
+
+        return Map.of("in_constraint", idInStr);
+    }
 
     //get total kwh consumption for a list of meters in a scope for the past 24 hours
     public Map<String, Object> getAllActiveKwhConsumption(String localNow, Map<String, String> scope){
