@@ -7,8 +7,8 @@ import com.xt.utils.MathUtil;
 import com.xt.utils.SqlUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -919,32 +919,6 @@ public class QueryHelper {
         return (meterSnList.get(0).get("meter_displayname") == null ? "" : meterSnList.get(0).get("meter_displayname").toString());
     }
 
-    public ResponseEntity<Map<String, Object>> getMeterSnFromDisplayName(Map<String, String> reqMeterDisplayName){
-        if(!reqMeterDisplayName.containsKey("meter_displayname")){
-            return ResponseEntity.badRequest()
-                    .body(Collections.singletonMap("error", "meter_displayname not found"));
-        }
-        String meterDisplayName = reqMeterDisplayName.get("meter_displayname");
-        if(meterDisplayName.isBlank()){
-            return ResponseEntity.badRequest()
-                    .body(Collections.singletonMap("error", "meter_displayname is blank"));
-        }
-
-        String meterSnStr = "";
-        try {
-            meterSnStr = getMeterSnFromMeterDisplayname(meterDisplayName);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Error getting meter_sn for meterDisplayname: " + meterDisplayName));
-        }
-
-        if(meterSnStr.isBlank()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Collections.singletonMap("info", "meter_sn is not found for meterDisplayname: " + meterDisplayName));
-        }
-
-        return ResponseEntity.ok(Collections.singletonMap("meter_sn", meterSnStr));
-    }
 
     public Map<String, Object> getLatestMeterCredit(String meterSnStr, String tableName){
         if(tableName == null || tableName.isBlank()){
