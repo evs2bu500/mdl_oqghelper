@@ -1721,4 +1721,20 @@ public class QueryHelper {
         }
     }
 
+    public Map<String, Object> getMeter3pAllFields(String meterSnStr){
+        String sql = "select * from meter_3p where meter_sn = '" + meterSnStr + "'";
+        List<Map<String, Object>> meter3pAllFields = new ArrayList<>();
+        try {
+            meter3pAllFields = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting meter 3p info for meterSn: " + meterSnStr);
+            throw new RuntimeException(e);
+        }
+        if(meter3pAllFields.isEmpty()){
+            logger.info("meter 3p info is empty for meterSn: " + meterSnStr);
+            return Collections.singletonMap("info", "meter 3p info is empty for meterSn: " + meterSnStr);
+        }
+        return meter3pAllFields.get(0);
+    }
+
 }
