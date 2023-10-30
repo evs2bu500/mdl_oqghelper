@@ -575,6 +575,43 @@ public class QueryHelper {
         return Map.of("scope_constraint", meterIdInStr);
     }
 
+    public Map<String, Object> getScopeItemConstraint(Map<String, String>scope,
+                                                      String itemTableName, String itemIdColName){
+        if(scope == null || scope.isEmpty()){
+            return Map.of("scope_constraint", "");
+        }
+
+        String itemIdInStr = "";
+        String scopeConstraint = "";
+        //priority: site > project
+        if(scope.containsKey("site_tag")){
+            scopeConstraint = " site_tag = '" + scope.get("site_tag") + "' ";
+        }else if(scope.containsKey("scope_str")){
+            scopeConstraint = " scope_str ilike '%" + scope.get("scope_str") + "%' ";
+        }
+        Map<String, Object> result = new HashMap<>();
+        if(!scopeConstraint.isEmpty()){
+            //get itemId within the scope
+            String sql = "select " +itemIdColName+ " from "+itemTableName+" where " + scopeConstraint;
+            List<Map<String, Object>> itemIds = new ArrayList<>();
+            try {
+                itemIds = oqgHelper.OqgR2(sql, true);
+            } catch (Exception e) {
+                logger.info("Error getting "+itemIdColName+" within scope: " + scopeConstraint);
+                return Map.of("error", "Error getting "+itemIdColName+" within scope: " + scopeConstraint);
+            }
+
+            if(!itemIds.isEmpty()){
+                //build a 'in' string for sql
+                itemIdInStr = itemIds.stream().map(meter -> "'" + meter.get(itemIdColName) + "'").collect(Collectors.joining(","));
+                itemIdInStr = " and "+itemIdColName+" in (" + itemIdInStr + ")";
+            }
+            result.put("item_ids", itemIds);
+            result.put("scope_constraint", itemIdInStr);
+        }
+        return result;
+    }
+
     public Map<String, Object> getInConstraint(String selectSql, String meterIdColName){
 
         String meterIdInStr = "";
@@ -1735,6 +1772,45 @@ public class QueryHelper {
             return Collections.singletonMap("info", "meter 3p info is empty for meterSn: " + meterSnStr);
         }
         return meter3pAllFields.get(0);
+    }
+
+    public Map<String, Object> getAllActiveKwh3p(String localNow,
+                                                 Map<String, String> scope,
+                                                 String itemTableName, String itemIdColName, String timeKey){
+        Map<String, Object> scopeConstraint = getScopeItemConstraint(scope, itemTableName, itemIdColName);
+        if (scopeConstraint.containsKey("error")){
+            return scopeConstraint;
+        }
+        String itemIdInStr = scopeConstraint.get("scope_constraint").toString();
+        List<Map<String, Object>> itemIds = (List<Map<String, Object>>) scopeConstraint.get("item_ids");
+
+        double totalKwh3p = 0;
+        for(Map<String, Object> item : itemIds){
+            String itemId = (String) item.get(itemIdColName);
+
+            //last 24 hours
+            String sql = "select "+itemIdColName+" from "+itemTableName+" where "+itemIdColName+" = '" + itemId + "'" +
+                    " and "+timeKey+" >= '" + localNow + "' - interval '24 hours' ";
+            List<Map<String, Object>> kwh3p = new ArrayList<>();
+            try {
+                kwh3p = oqgHelper.OqgR2(sql, true);
+            } catch (Exception e) {
+                logger.info("Error getting kwh3p for itemId: " + itemId);
+                throw new RuntimeException(e);
+            }
+            //get the diff of the first and last record
+            if(kwh3p.size()<2){
+                continue;
+            }
+            String firstKwhStr = (String) kwh3p.get(0).get(itemIdColName);
+            String lastKwhStr = (String) kwh3p.get(kwh3p.size()-1).get(itemIdColName);
+            double firstKwh = MathUtil.ObjToDouble(firstKwhStr);
+            double lastKwh = MathUtil.ObjToDouble(lastKwhStr);
+            double diffKwh = lastKwh - firstKwh;
+            totalKwh3p += diffKwh;
+        }
+
+        return Map.of("total_kwh_3p", totalKwh3p);
     }
 
 }
