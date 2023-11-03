@@ -642,11 +642,8 @@ public class QueryHelper {
                 //build a 'in' string for sql
                 itemIdInStr = items.stream().map(meter -> "'" + meter.get(itemIdColName) + "'").collect(Collectors.joining(","));
                 itemIdInStr = " and "+itemIdColName+" in (" + itemIdInStr + ")";
-
-
-
             }
-            result.put("item_ids", itemIds);
+            result.put("items", items);
             result.put("scope_constraint", itemIdInStr);
         }
         return result;
