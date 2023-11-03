@@ -629,7 +629,7 @@ public class QueryHelper {
         Map<String, Object> result = new HashMap<>();
         if(!scopeConstraint.isEmpty()){
             //get itemId within the scope
-            String sql = "select " +itemIdColName+ " site_tag, scope_str from "+itemTableName+" where " + scopeConstraint;
+            String sql = "select " +itemIdColName+ ", site_tag, scope_str from "+itemTableName+" where " + scopeConstraint;
             List<Map<String, Object>> items = new ArrayList<>();
             try {
                 items = oqgHelper.OqgR2(sql, true);
