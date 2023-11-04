@@ -694,6 +694,22 @@ public class QueryHelper {
         return Map.of("in_constraint", idInStr);
     }
 
+    public Map<String, Object> getFullRecordTimeRange(String tableName, String timeKey, String itemKey, String itemValue){
+        String sql = "select min("+timeKey+") as min_time, max("+timeKey+") as max_time from " + tableName
+                + " where " + itemKey + " = '" + itemValue + "'";
+
+        List<Map<String, Object>> timeRange = new ArrayList<>();
+        try {
+            timeRange = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(timeRange.isEmpty()){
+            return Collections.singletonMap("info", "no data");
+        }
+        return Collections.singletonMap("time_range", timeRange.get(0));
+    }
+
     //get total kwh consumption for a list of meters in a scope for the past 24 hours
     public Map<String, Object> getAllActiveKwhConsumption(String localNow, Map<String, String> scope){
         List<Map<String, Object>> kwhConsumption = new ArrayList<>();
