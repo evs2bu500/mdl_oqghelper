@@ -612,6 +612,46 @@ public class QueryHelper {
         return result;
     }
 
+    public Map<String, Object> getScopeItemConstraint3(Map<String, String>scope,
+                                                       String itemTableName,
+                                                       String itemIdColName,
+                                                       List<String> selColNames){
+        if(scope == null || scope.isEmpty()){
+            return Map.of("scope_constraint", "");
+        }
+
+        String itemIdInStr = "";
+        String scopeConstraint = "";
+        //priority: site > project
+        if(scope.containsKey("site_tag")){
+            scopeConstraint = " site_tag = '" + scope.get("site_tag") + "' ";
+        }else if(scope.containsKey("scope_str")){
+            scopeConstraint = " scope_str ilike '%" + scope.get("scope_str") + "%' ";
+        }
+        Map<String, Object> result = new HashMap<>();
+        if(!scopeConstraint.isEmpty()){
+            //get itemId within the scope
+            String sql = "select " +String.join(",", selColNames)+ " from "+itemTableName+" where " + scopeConstraint;
+//            String sql = "select " +itemIdColName+ ", site_tag, scope_str from "+itemTableName+" where " + scopeConstraint;
+            List<Map<String, Object>> items = new ArrayList<>();
+            try {
+                items = oqgHelper.OqgR2(sql, true);
+            } catch (Exception e) {
+                logger.info("Error getting "+ itemIdColName +" within scope: " + scopeConstraint);
+                return Map.of("error", "Error getting "+ itemIdColName +" within scope: " + scopeConstraint);
+            }
+
+            if(!items.isEmpty()){
+                //build a 'in' string for sql
+                itemIdInStr = items.stream().map(meter -> "'" + meter.get(itemIdColName) + "'").collect(Collectors.joining(","));
+                itemIdInStr = " and "+itemIdColName+" in (" + itemIdInStr + ")";
+            }
+            result.put("items", items);
+            result.put("scope_constraint", itemIdInStr);
+        }
+        return result;
+    }
+
     public Map<String, Object> getScopeItemConstraint2(Map<String, String>scope,
                                                       String itemTableName, String itemIdColName){
         if(scope == null || scope.isEmpty()){
