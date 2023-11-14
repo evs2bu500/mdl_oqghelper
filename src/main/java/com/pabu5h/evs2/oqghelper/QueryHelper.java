@@ -1,5 +1,7 @@
 package com.pabu5h.evs2.oqghelper;
 
+import com.pabu5h.evs2.dto.ItemIdType;
+import com.pabu5h.evs2.dto.ItemType;
 import com.pabu5h.evs2.dto.MeterBypassDto;
 import com.pabu5h.evs2.dto.MeterInfoDto;
 import com.xt.utils.DateTimeUtil;
@@ -1904,6 +1906,69 @@ public class QueryHelper {
         }
 
         return Map.of("total_kwh_3p", totalKwh3p);
+    }
+
+    public Map<String, Object> getItemLastReading(String itemId, ItemIdType itemIdType, ItemType itemType){
+        Map<String, String> itemReadingTableInfo = getItemReadingTableInfo(itemType, itemIdType);
+        if(itemReadingTableInfo == null){
+            return Collections.singletonMap("error", "itemType not supported");
+        }
+        String tableName = itemReadingTableInfo.get("table_name");
+        String timeKey = itemReadingTableInfo.get("time_key");
+        String itemIdColName = itemReadingTableInfo.get("item_id_col_name");
+
+        String sql = "select "+itemIdColName+" from "+tableName+" where "+itemIdColName+" = '" + itemId + "'" +
+                " order by "+timeKey+" desc limit 1";
+        List<Map<String, Object>> lastReading = new ArrayList<>();
+        try {
+            lastReading = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting last reading for itemId: " + itemId);
+            throw new RuntimeException(e);
+        }
+        if(lastReading.isEmpty()){
+            logger.info("last reading is empty for itemId: " + itemId);
+            return Collections.singletonMap("info", "last reading is empty for itemId: " + itemId);
+        }
+        return lastReading.get(0);
+    }
+
+    private Map<String, String> getItemReadingTableInfo(ItemType itemType, ItemIdType itemIdType){
+        String tableName = "";
+        String itemIdColName = "";
+        String timeKey = "";
+
+        switch (itemType) {
+            case METER:
+                tableName = "meter_reading";
+                timeKey = "kwh_timestamp";
+                itemIdColName = "meter_sn";
+                if(itemIdType == ItemIdType.name){
+                    itemIdColName = "meter_displayname";
+                }
+                break;
+            case METER_3P:
+                tableName = "meter_reading_3p";
+                timeKey = "dt";
+                itemIdColName = "meter_sn";
+                if(itemIdType == ItemIdType.name){
+                    itemIdColName = "meter_id";
+                }
+                break;
+            case SENSOR:
+                tableName = "sensor_reading";
+                timeKey = "dt";
+                itemIdColName = "item_id";
+                if(itemIdType == ItemIdType.name){
+                    itemIdColName = "item_name";
+                }
+                break;
+            default:
+                return null;
+        }
+        return Map.of("table_name", tableName,
+                      "time_key", timeKey,
+                      "item_id_col_name", itemIdColName);
     }
 
 }
