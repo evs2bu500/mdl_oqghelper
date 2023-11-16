@@ -1917,20 +1917,21 @@ public class QueryHelper {
         String timeKey = itemReadingTableInfo.get("time_key");
         String itemIdColName = itemReadingTableInfo.get("item_id_col_name");
 
-        String sql = "select "+itemIdColName+" from "+tableName+" where "+itemIdColName+" = '" + itemId + "'" +
+        String sql = "select "+itemIdColName+",  "+timeKey+" from "+tableName+" where "+itemIdColName+" = '" + itemId + "'" +
                 " order by "+timeKey+" desc limit 1";
         List<Map<String, Object>> lastReading = new ArrayList<>();
         try {
             lastReading = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
             logger.info("Error getting last reading for itemId: " + itemId);
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            return Collections.singletonMap("error", "Error getting last reading for itemId: " + itemId);
         }
         if(lastReading.isEmpty()){
             logger.info("last reading is empty for itemId: " + itemId);
             return Collections.singletonMap("info", "last reading is empty for itemId: " + itemId);
         }
-        return lastReading.get(0);
+        return Collections.singletonMap("last_reading", lastReading.get(0));
     }
 
     private Map<String, String> getItemReadingTableInfo(ItemType itemType, ItemIdType itemIdType){
