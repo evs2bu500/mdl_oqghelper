@@ -1917,9 +1917,10 @@ public class QueryHelper {
         }
         String tableName = itemReadingTableInfo.get("table_name");
         String timeKey = itemReadingTableInfo.get("time_key");
+        String valKey = itemReadingTableInfo.get("val_key");
         String itemIdColName = itemReadingTableInfo.get("item_id_col_name");
 
-        String sql = "select "+itemIdColName+",  "+timeKey+" from "+tableName+" where "+itemIdColName+" = '" + itemId + "'" +
+        String sql = "select "+valKey+",  "+timeKey+" from "+tableName+" where "+itemIdColName+" = '" + itemId + "'" +
                 " order by "+timeKey+" desc limit 1";
         List<Map<String, Object>> lastReading = new ArrayList<>();
         try {
@@ -1939,12 +1940,14 @@ public class QueryHelper {
     private Map<String, String> getItemReadingTableInfo(ItemTypeEnum itemType, ItemIdTypeEnum itemIdType){
         String tableName = "";
         String itemIdColName = "";
+        String valKey = "";
         String timeKey = "";
 
         switch (itemType) {
             case METER:
                 tableName = "meter_reading";
                 timeKey = "kwh_timestamp";
+                valKey = "kwh_total";
                 itemIdColName = "meter_sn";
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_displayname";
@@ -1953,6 +1956,7 @@ public class QueryHelper {
             case METER_3P:
                 tableName = "meter_reading_3p";
                 timeKey = "dt";
+                valKey = "a_import";
                 itemIdColName = "meter_sn";
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_id";
@@ -1961,6 +1965,7 @@ public class QueryHelper {
             case SENSOR:
                 tableName = "sensor_reading";
                 timeKey = "dt";
+                valKey = "val";
                 itemIdColName = "item_id";
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "item_name";
@@ -1971,6 +1976,7 @@ public class QueryHelper {
         }
         return Map.of("table_name", tableName,
                       "time_key", timeKey,
+                      "val_key", valKey,
                       "item_id_col_name", itemIdColName);
     }
 
