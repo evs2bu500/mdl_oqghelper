@@ -1,7 +1,9 @@
 package com.pabu5h.evs2.oqghelper;
 
-import com.pabu5h.evs2.dto.ItemIdType;
-import com.pabu5h.evs2.dto.ItemType;
+import com.pabu5h.evs2.dto.ItemIdTypeEnum;
+import com.pabu5h.evs2.dto.ItemIdTypeEnum;
+import com.pabu5h.evs2.dto.ItemTypeEnum;
+import com.pabu5h.evs2.dto.ItemTypeEnum;
 import com.pabu5h.evs2.dto.MeterBypassDto;
 import com.pabu5h.evs2.dto.MeterInfoDto;
 import com.xt.utils.DateTimeUtil;
@@ -1908,7 +1910,7 @@ public class QueryHelper {
         return Map.of("total_kwh_3p", totalKwh3p);
     }
 
-    public Map<String, Object> getItemLastReading(String itemId, ItemIdType itemIdType, ItemType itemType){
+    public Map<String, Object> getItemLastReading(String itemId, ItemIdTypeEnum itemIdType, ItemTypeEnum itemType){
         Map<String, String> itemReadingTableInfo = getItemReadingTableInfo(itemType, itemIdType);
         if(itemReadingTableInfo == null){
             return Collections.singletonMap("error", "itemType not supported");
@@ -1934,7 +1936,7 @@ public class QueryHelper {
         return Collections.singletonMap("last_reading", lastReading.get(0));
     }
 
-    private Map<String, String> getItemReadingTableInfo(ItemType itemType, ItemIdType itemIdType){
+    private Map<String, String> getItemReadingTableInfo(ItemTypeEnum itemType, ItemIdTypeEnum itemIdType){
         String tableName = "";
         String itemIdColName = "";
         String timeKey = "";
@@ -1944,7 +1946,7 @@ public class QueryHelper {
                 tableName = "meter_reading";
                 timeKey = "kwh_timestamp";
                 itemIdColName = "meter_sn";
-                if(itemIdType == ItemIdType.name){
+                if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_displayname";
                 }
                 break;
@@ -1952,7 +1954,7 @@ public class QueryHelper {
                 tableName = "meter_reading_3p";
                 timeKey = "dt";
                 itemIdColName = "meter_sn";
-                if(itemIdType == ItemIdType.name){
+                if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_id";
                 }
                 break;
@@ -1960,7 +1962,7 @@ public class QueryHelper {
                 tableName = "sensor_reading";
                 timeKey = "dt";
                 itemIdColName = "item_id";
-                if(itemIdType == ItemIdType.name){
+                if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "item_name";
                 }
                 break;
