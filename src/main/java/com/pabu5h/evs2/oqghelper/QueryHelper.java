@@ -1910,6 +1910,39 @@ public class QueryHelper {
         return Map.of("total_kwh_3p", totalKwh3p);
     }
 
+    public Map<String, Object> getOpsLogItem(String key, String val){
+        String tableName = "evs2_op_log";
+        String sql = "select * from "+tableName+" where "+key+" = '" + val + "'";
+        List<Map<String, Object>> historyOps = new ArrayList<>();
+        try {
+            historyOps = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting history ops for tableName: " + tableName);
+            throw new RuntimeException(e);
+        }
+        if(historyOps.isEmpty()){
+            logger.info("history ops is empty for tableName: " + tableName);
+            return Collections.singletonMap("info", "history ops is empty for tableName: " + tableName);
+        }
+        //get username from user table
+        String userIdStr = (String) historyOps.get(0).get("user_id");
+        String sql2 = "select username from user where id = " + userIdStr;
+        List<Map<String, Object>> users = new ArrayList<>();
+        try {
+            users = oqgHelper.OqgR2(sql2, true);
+        } catch (Exception e) {
+            logger.info("Error getting user for userId: " + userIdStr);
+            throw new RuntimeException(e);
+        }
+        if(users.isEmpty()){
+            logger.info("user is empty for userId: " + userIdStr);
+            return Collections.singletonMap("info", "user is empty for userId: " + userIdStr);
+        }
+        String username = (String) users.get(0).get("username");
+        historyOps.get(0).put("username", username);
+        return historyOps.get(0);
+    }
+
     public Map<String, Object> getItemLastReading(String itemId, ItemIdTypeEnum itemIdType, ItemTypeEnum itemType){
         Map<String, String> itemReadingTableInfo = getItemReadingTableInfo(itemType, itemIdType);
         if(itemReadingTableInfo == null){
