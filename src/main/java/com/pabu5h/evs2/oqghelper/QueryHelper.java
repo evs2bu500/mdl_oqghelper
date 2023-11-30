@@ -1912,6 +1912,7 @@ public class QueryHelper {
 
     public Map<String, Object> getOpsLogItem(String key, String val){
         String tableName = "evs2_op_log";
+        String userTableName = "evs2_user";
         String sql = "select * from "+tableName+" where "+key+" = '" + val + "'";
         List<Map<String, Object>> historyOps = new ArrayList<>();
         try {
@@ -1926,7 +1927,7 @@ public class QueryHelper {
         }
         //get username from user table
         String userIdStr = (String) historyOps.get(0).get("user_id");
-        String sql2 = "select username from user where id = " + userIdStr;
+        String sql2 = "select username from "+userTableName+" where id = " + userIdStr;
         List<Map<String, Object>> users = new ArrayList<>();
         try {
             users = oqgHelper.OqgR2(sql2, true);
