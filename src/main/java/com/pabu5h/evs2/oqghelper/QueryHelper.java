@@ -962,6 +962,9 @@ public class QueryHelper {
         if(totalTopup.isEmpty()){
             return Collections.singletonMap("info", "no data");
         }
+        for(Map<String, Object> topup : totalTopup){
+            topup.putIfAbsent(labelAs, 0);
+        }
         //sort by date in descending order
         totalTopup.sort(Comparator.comparing(m -> m.get("timestamp").toString()));
         Collections.reverse(totalTopup);
