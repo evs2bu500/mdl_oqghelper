@@ -254,16 +254,106 @@ public class QueryHelper {
         return Map.of("building_list", meterInfo.stream().map(meter -> meter.get("mms_building")).toList());
     }
 
+    public Map<String, Object> getScopeBuildings(String projectScope, String siteScope){
+        String sql = "select DISTINCT mms_building from meter";
+
+        String meterTableName = "meter";
+        String colNameBuilding = "mms_building";
+        if(projectScope != null && !projectScope.isEmpty()){
+            if(projectScope.toLowerCase().contains("cw_nus")){
+                meterTableName = "meter_iwow";
+                colNameBuilding = "loc_building";
+            }
+        }
+        String finalColNameBuilding = colNameBuilding;
+
+        Map<String, Object> likeTargets = new HashMap<>();
+        if(projectScope != null && !projectScope.isEmpty()){
+            likeTargets.put("scope_str", projectScope);
+        }
+        if(siteScope != null && !siteScope.isEmpty()){
+            likeTargets.put("site_tag", siteScope);
+        }
+        Map<String, String> sqlResult = SqlUtil.makeSelectSql2(
+                Map.of("from", meterTableName,
+                       "select",
+                       "DISTINCT " + colNameBuilding,
+                       "like_targets", likeTargets
+                ));
+        sql = sqlResult.get("sql");
+        sql = sql + " ORDER BY "+colNameBuilding+" ASC";
+
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.isEmpty()){
+            return Map.of("info", "building not found");
+        }
+        return Map.of("building_list", meterInfo.stream().map(meter -> meter.get(finalColNameBuilding)).toList());
+    }
+    public Map<String, Object> getScopeLevels(String building, String block,
+                                              String projectScope, String siteScope){
+        String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'"
+                + " ORDER BY mms_level ASC";
+
+        String meterTableName = "meter";
+        String colNameBuilding = "mms_building";
+        String colNameBlock = "mms_block";
+        String colNameLevel = "mms_level";
+        Map<String, Object> targets = new HashMap<>();
+        targets.put("mms_building", building);
+        targets.put("mms_block", block);
+
+        if(projectScope != null && !projectScope.isEmpty()){
+            if(projectScope.toLowerCase().contains("cw_nus")){
+                meterTableName = "meter_iwow";
+                colNameBuilding = "loc_building";
+//                colNameBlock = "loc_block";
+                colNameLevel = "loc_level";
+                targets.clear();
+                targets.put("loc_building", building);
+            }
+        }
+
+        String finalColNameLevel = colNameLevel;
+
+        Map<String, Object> likeTargets = new HashMap<>();
+        if(projectScope != null && !projectScope.isEmpty()){
+            likeTargets.put("scope_str", projectScope);
+        }
+        if(siteScope != null && !siteScope.isEmpty()){
+            likeTargets.put("site_tag", siteScope);
+        }
+        Map<String, String> sqlResult = SqlUtil.makeSelectSql2(
+                Map.of("from", meterTableName,
+                        "select",
+                        "DISTINCT " + colNameLevel,
+                        "targets", targets,
+                        "like_targets", likeTargets
+                ));
+        sql = sqlResult.get("sql");
+        sql = sql + " ORDER BY "+colNameLevel+" ASC";
+
+        List<Map<String, Object>> meterInfo = new ArrayList<>();
+        try {
+            meterInfo = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(meterInfo.isEmpty()){
+            return Map.of("info", "level not found");
+        }
+        return Map.of("level_list", meterInfo.stream().map(meter -> meter.get(finalColNameLevel)).toList());
+    }
+
     public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope, String siteScope){
         String sql = "select DISTINCT mms_block from meter where " +
                 " mms_building = '" + building + "'" +
                 " ORDER BY mms_block ASC";
-//        if(projectScope != null && !projectScope.isEmpty()){
-//            // syntax error
-////            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
-//            sql = "select DISTINCT mms_block from meter where mms_building = '" + building + "' and scope_str LIKE '%" + projectScope + "%'" +
-//                    " ORDER BY mms_block ASC";
-//        }
+
         Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
             likeTargets.put("scope_str", projectScope);
@@ -296,12 +386,6 @@ public class QueryHelper {
     public Map<String, Object> getMmsLevels (String building, String block, String projectScope, String siteScope){
         String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'"
                 + " ORDER BY mms_level ASC";
-//        if(projectScope != null && !projectScope.isEmpty()){
-//            // syntax error
-////            sql = sql + " and scope_str LIKE '%" + projectScope + "%'";
-//            sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "' and scope_str LIKE '%" + projectScope + "%'"
-//                    + " ORDER BY mms_level ASC";
-//        }
         Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
             likeTargets.put("scope_str", projectScope);
