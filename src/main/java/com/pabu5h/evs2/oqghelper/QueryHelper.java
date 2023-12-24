@@ -29,6 +29,26 @@ public class QueryHelper {
     private OqgHelper oqgHelper;
     private final Logger logger = Logger.getLogger(QueryHelper.class.getName());
 
+    public Map<String, Object> checkExists(String table, String key, String value, boolean useR2){
+        String sql = "select * from " + table + " where " + key + " = '" + value + "'";
+        List<Map<String, Object>> resp;
+        try {
+            if(useR2){
+                resp = oqgHelper.OqgR2(sql, true);
+            }else {
+                resp = oqgHelper.OqgR(sql);
+            }
+        } catch (Exception e) {
+//            throw new RuntimeException(e);
+            logger.info("Error checking exists for table: " + table + ", key: " + key + ", value: " + value);
+            return Map.of("error", "Error checking exists for table: " + table + ", key: " + key + ", value: " + value);
+        }
+        if(resp.isEmpty()){
+            return Map.of("exists", false);
+        }
+        return Map.of("exists", true);
+    }
+
     public List<String> getNewerMeterSns(){
         // meterSn must be at least 10 characters long
         // and must start with 2018, 2019, 2020, 2021 and above
