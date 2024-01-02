@@ -2160,8 +2160,9 @@ public class QueryHelper {
             oqgHelper.OqgIU(sql);
         } catch (Exception e) {
             logger.info("Error setting project scope for username: " + username);
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            return Collections.singletonMap("error", "Error setting project scope for username: " + username);
         }
-        return Collections.singletonMap("info", "project scope is set for username: " + username);
+        return Collections.singletonMap("success", "project scope is set for username: " + username);
     }
 }
