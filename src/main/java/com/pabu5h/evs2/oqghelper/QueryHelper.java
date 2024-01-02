@@ -2153,4 +2153,15 @@ public class QueryHelper {
         return resp.getFirst();
     }
 
+    public Map<String, Object> setUserScope(String username, String projectScope){
+        String sql = "update evs2_user set scope_str = '" + projectScope + "' where username = '" + username + "'";
+
+        try {
+            oqgHelper.OqgIU(sql);
+        } catch (Exception e) {
+            logger.info("Error setting project scope for username: " + username);
+            throw new RuntimeException(e);
+        }
+        return Collections.singletonMap("info", "project scope is set for username: " + username);
+    }
 }
