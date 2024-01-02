@@ -2135,4 +2135,22 @@ public class QueryHelper {
                       "item_id_col_name", itemIdColName);
     }
 
+    public Map<String, Object> getProjectScopeFromSiteScope(String siteScopeStr){
+        String sql = "select project_scope from scope_setting where site_scope = '" + siteScopeStr + "'";
+
+        List<Map<String, Object>> resp;
+
+        try {
+            resp = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting project scope for site scope: " + siteScopeStr);
+            throw new RuntimeException(e);
+        }
+        if(resp.isEmpty()){
+            logger.info("project scope is empty for site scope: " + siteScopeStr);
+            return Collections.singletonMap("info", "project scope is empty for site scope: " + siteScopeStr);
+        }
+        return resp.getFirst();
+    }
+
 }
