@@ -29,6 +29,20 @@ public class QueryHelper {
     private OqgHelper oqgHelper;
     private final Logger logger = Logger.getLogger(QueryHelper.class.getName());
 
+    public Map<String, Object> getTableField(String tableName, String fieldName, String idConstraintKey, String idConstraintValue){
+        String sql = "select " + fieldName + " from " + tableName + " where " + idConstraintKey + " = '" + idConstraintValue + "'";
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(resp.isEmpty()){
+            return Map.of("error", "No record found for " + idConstraintKey + " = " + idConstraintValue);
+        }
+        return resp.getFirst();
+    }
+
     public Map<String, Object> checkExists(String table, String key, String value, boolean useR2){
         String sql = "select * from " + table + " where " + key + " = '" + value + "'";
         List<Map<String, Object>> resp;
