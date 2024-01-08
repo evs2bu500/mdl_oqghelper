@@ -2179,4 +2179,16 @@ public class QueryHelper {
         }
         return Collections.singletonMap("success", "project scope is set for username: " + username);
     }
+    public Map<String, Object> getVersion(String serviceName, String projectScope){
+        String sql = "select version from service_version where service_name = '" + serviceName + "' and scope_str = '" + projectScope + "'";
+
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting version for service name: " + serviceName + " and project scope: " + projectScope);
+            return Collections.singletonMap("error", "Error getting version for service name: " + serviceName + " and project scope: " + projectScope);
+        }
+        return resp.getFirst();
+    }
 }
