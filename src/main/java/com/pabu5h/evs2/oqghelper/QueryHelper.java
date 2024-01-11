@@ -2191,4 +2191,41 @@ public class QueryHelper {
         }
         return resp.getFirst();
     }
+    public Map<String, Object> getReportSub(int reportId){
+        String sql = "select user_id, active from report_sub where report_id = " + reportId;
+
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting report sub");
+            return Collections.singletonMap("error", "Error getting report sub");
+        }
+
+        List<Map<String, Object>> reportSubs = new ArrayList<>();
+        for(Map<String, Object> sub : resp){
+            String userIdStr = (String) sub.get("user_id");
+            String sql2 = "select username, fullname, email from evs2_user " +
+                    "where id = " + userIdStr + " and active = true";
+            List<Map<String, Object>> users;
+            try {
+                users = oqgHelper.OqgR2(sql2, true);
+            } catch (Exception e) {
+                logger.info("Error getting user for userId: " + userIdStr);
+                throw new RuntimeException(e);
+            }
+            if(users.isEmpty()){
+                logger.info("user is empty for userId: " + userIdStr);
+                continue;
+            }
+            String username = (String) users.getFirst().get("username");
+            String fullname = (String) users.getFirst().get("fullname");
+            String email = (String) users.getFirst().get("email");
+            reportSubs.add(Map.of(
+                "username", username,
+                "fullname", fullname,
+                "email", email));
+        }
+        return Map.of("report_subs", reportSubs);
+    }
 }
