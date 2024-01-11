@@ -2192,7 +2192,7 @@ public class QueryHelper {
         return resp.getFirst();
     }
     public Map<String, Object> getReportSub(int reportId){
-        String sql = "select user_id, active from report_sub where report_id = " + reportId;
+        String sql = "select user_id from report_sub where report_id = " + reportId + " and active = true";
 
         List<Map<String, Object>> resp;
         try {
@@ -2206,7 +2206,7 @@ public class QueryHelper {
         for(Map<String, Object> sub : resp){
             String userIdStr = (String) sub.get("user_id");
             String sql2 = "select username, fullname, email from evs2_user " +
-                    "where id = " + userIdStr + " and active = true";
+                    "where id = " + userIdStr;
             List<Map<String, Object>> users;
             try {
                 users = oqgHelper.OqgR2(sql2, true);
