@@ -2079,12 +2079,37 @@ public class QueryHelper {
         return historyOps.get(0);
     }
 
+    public Map<String, Object> getItemInfo(String itemId, ItemIdTypeEnum itemIdType, ItemTypeEnum itemType){
+        Map<String, String> itemTableInfo = getItemTableInfo(itemType, itemIdType);
+        if(itemTableInfo == null){
+            return Collections.singletonMap("error", "itemType not supported");
+        }
+        String tableName = itemTableInfo.get("item_table_name");
+        String itemIdColName = itemTableInfo.get("item_id_col_name");
+        String propSelectStr = itemTableInfo.get("prop_select");
+
+        String sql = "select "+propSelectStr+" from "+tableName+" where "+itemIdColName+" = '" + itemId + "'";
+
+        List<Map<String, Object>> itemInfo = new ArrayList<>();
+        try {
+            itemInfo = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting item info for itemId: " + itemId);
+//            throw new RuntimeException(e);
+            return Collections.singletonMap("error", "Error getting item info for itemId: " + itemId);
+        }
+        if(itemInfo.isEmpty()){
+            logger.info("item info not found for itemId: " + itemId);
+            return Collections.singletonMap("info", "item info not found for itemId: " + itemId);
+        }
+        return Collections.singletonMap("item_info", itemInfo.getFirst());
+    }
     public Map<String, Object> getItemLastReading(String itemId, ItemIdTypeEnum itemIdType, ItemTypeEnum itemType){
-        Map<String, String> itemReadingTableInfo = getItemReadingTableInfo(itemType, itemIdType);
+        Map<String, String> itemReadingTableInfo = getItemTableInfo(itemType, itemIdType);
         if(itemReadingTableInfo == null){
             return Collections.singletonMap("error", "itemType not supported");
         }
-        String tableName = itemReadingTableInfo.get("table_name");
+        String tableName = itemReadingTableInfo.get("item_reading_table_name");
         String timeKey = itemReadingTableInfo.get("time_key");
         String valKey = itemReadingTableInfo.get("val_key");
         String itemIdColName = itemReadingTableInfo.get("item_id_col_name");
@@ -2106,44 +2131,65 @@ public class QueryHelper {
         return Collections.singletonMap("last_reading", lastReading.get(0));
     }
 
-    private Map<String, String> getItemReadingTableInfo(ItemTypeEnum itemType, ItemIdTypeEnum itemIdType){
-        String tableName = "";
+    private Map<String, String> getItemTableInfo(ItemTypeEnum itemType, ItemIdTypeEnum itemIdType){
+        String itemTableName = "";
+        String itemReadingTableName = "";
         String itemIdColName = "";
         String valKey = "";
         String timeKey = "";
+        String propSelect = "";
 
         switch (itemType) {
             case METER:
-                tableName = "meter_reading";
+                itemTableName = "meter";
+                itemReadingTableName = "meter_reading";
                 timeKey = "kwh_timestamp";
                 valKey = "kwh_total";
                 itemIdColName = "meter_sn";
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_displayname";
                 }
+                propSelect = "meter_sn, meter_displayname, site_tag, scope_str, mms_address, mms_unit, mms_level, mms_block, mms_building, esim_id, mms_online_timestamp";
                 break;
             case METER_3P:
-                tableName = "meter_reading_3p";
+                itemTableName = "meter_3p";
+                itemReadingTableName = "meter_reading_3p";
                 timeKey = "dt";
                 valKey = "a_import";
                 itemIdColName = "meter_sn";
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_id";
                 }
+                propSelect = "meter_sn, meter_id, site_tag, scope_str";
                 break;
             case SENSOR:
-                tableName = "sensor_reading";
+                itemTableName = "sensor";
+                itemReadingTableName = "sensor_reading";
                 timeKey = "dt";
                 valKey = "val";
                 itemIdColName = "item_id";
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "item_name";
                 }
+                propSelect = "item_id, item_name, site_tag, scope_str";
+                break;
+            case METER_IWOW:
+                itemTableName = "meter_iwow";
+                itemReadingTableName = "meter_reading_iwow";
+                timeKey = "dt";
+                valKey = "val";
+                itemIdColName = "item_name";
+                if(itemIdType == ItemIdTypeEnum.NAME){
+                    itemIdColName = "item_name";
+                }
+                propSelect = "item_sn, item_name, meter_type, site_tag, scope_str, alt_name, location_tag, loc_building, loc_level";
                 break;
             default:
                 return null;
         }
-        return Map.of("table_name", tableName,
+        return Map.of("item_table_name", itemTableName,
+                      "item_reading_table_name", itemReadingTableName,
+                      "prop_select", propSelect,
                       "time_key", timeKey,
                       "val_key", valKey,
                       "item_id_col_name", itemIdColName);
