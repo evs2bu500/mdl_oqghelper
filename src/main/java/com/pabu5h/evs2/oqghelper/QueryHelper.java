@@ -2184,6 +2184,28 @@ public class QueryHelper {
                 }
                 propSelect = "item_sn, item_name, meter_type, site_tag, scope_str, alt_name, location_tag, loc_building, loc_level";
                 break;
+            case METER_GROUP:
+                itemTableName = "meter_group";
+                itemReadingTableName = "";
+                timeKey = "";
+                valKey = "";
+                itemIdColName = "name";
+                if(itemIdType == ItemIdTypeEnum.NAME){
+                    itemIdColName = "name";
+                }
+                propSelect = "name, label, meter_type, scope_str, meter_info_str, created_timestamp, updated_timestamp";
+                break;
+            case TENANT:
+                itemTableName = "tenant";
+                itemReadingTableName = "";
+                timeKey = "";
+                valKey = "";
+                itemIdColName = "tenant_name";
+                if(itemIdType == ItemIdTypeEnum.NAME){
+                    itemIdColName = "tenant_name";
+                }
+                propSelect = "tenant_name, tenant_label, type, scope_str, sap_wbs, location_tag, created_timestamp";
+                break;
             default:
                 return null;
         }
