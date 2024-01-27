@@ -780,7 +780,9 @@ public class QueryHelper {
             if(!items.isEmpty()){
                 //build a 'in' string for sql
                 itemIdInStr = items.stream().map(meter -> "'" + meter.get(itemIdColName) + "'").collect(Collectors.joining(","));
-                itemIdInStr = " and "+itemIdColName+" in (" + itemIdInStr + ")";
+                itemIdInStr =
+//                        " and "+
+                        itemIdColName+" in (" + itemIdInStr + ")";
             }
             result.put("items", items);
             result.put("scope_constraint", itemIdInStr);
@@ -817,7 +819,9 @@ public class QueryHelper {
             if(!items.isEmpty()){
                 //build a 'in' string for sql
                 itemIdInStr = items.stream().map(meter -> "'" + meter.get(itemIdColName) + "'").collect(Collectors.joining(","));
-                itemIdInStr = " and "+itemIdColName+" in (" + itemIdInStr + ")";
+                itemIdInStr =
+//                        " and "+
+                                itemIdColName+" in (" + itemIdInStr + ")";
             }
             result.put("items", items);
             result.put("scope_constraint", itemIdInStr);
@@ -825,28 +829,28 @@ public class QueryHelper {
         return result;
     }
 
-    public Map<String, Object> getInConstraint(String selectSql, String meterIdColName){
-
-        String meterIdInStr = "";
-
-        String inConstraint = "";
-
-        List<Map<String, Object>> meterIds = new ArrayList<>();
-        try {
-            meterIds = oqgHelper.OqgR2(selectSql, true);
-        } catch (Exception e) {
-            logger.info("Error getting meterIds from sql: " + selectSql);
-            return Map.of("error", "Error getting meterIds from sql: " + selectSql);
-        }
-
-        if(!meterIds.isEmpty()){
-            //build a 'in' string for sql
-            meterIdInStr = meterIds.stream().map(meter -> "'" + meter.get(meterIdColName) + "'").collect(Collectors.joining(","));
-            meterIdInStr = " and "+meterIdColName+" in (" + meterIdInStr + ")";
-        }
-
-        return Map.of("in_constraint", meterIdInStr);
-    }
+//    public Map<String, Object> getInConstraint(String selectSql, String meterIdColName){
+//
+//        String meterIdInStr = "";
+//
+//        String inConstraint = "";
+//
+//        List<Map<String, Object>> meterIds = new ArrayList<>();
+//        try {
+//            meterIds = oqgHelper.OqgR2(selectSql, true);
+//        } catch (Exception e) {
+//            logger.info("Error getting meterIds from sql: " + selectSql);
+//            return Map.of("error", "Error getting meterIds from sql: " + selectSql);
+//        }
+//
+//        if(!meterIds.isEmpty()){
+//            //build a 'in' string for sql
+//            meterIdInStr = meterIds.stream().map(meter -> "'" + meter.get(meterIdColName) + "'").collect(Collectors.joining(","));
+//            meterIdInStr = " and "+meterIdColName+" in (" + meterIdInStr + ")";
+//        }
+//
+//        return Map.of("in_constraint", meterIdInStr);
+//    }
     public Map<String, Object> getInConstraint2(String selectSql, String srcIdColName, String targetIdColName){
 
         String idInStr = "";
