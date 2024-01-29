@@ -2211,6 +2211,9 @@ public class QueryHelper {
             default:
                 return null;
         }
+        if(itemIdType == ItemIdTypeEnum.ID){
+            itemIdColName = "id";
+        }
         return Map.of("item_table_name", itemTableName,
                       "item_reading_table_name", itemReadingTableName,
                       "prop_select", propSelect,
