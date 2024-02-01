@@ -829,6 +829,7 @@ public class QueryHelper {
         return result;
     }
 
+    @Deprecated
     public Map<String, Object> getInConstraint(String selectSql, String meterIdColName){
 
         String meterIdInStr = "";
@@ -849,6 +850,8 @@ public class QueryHelper {
 
         return Map.of("in_constraint", meterIdInStr);
     }
+
+    @Deprecated
     public Map<String, Object> getInConstraint2(String selectSql, String srcIdColName, String targetIdColName){
 
         String idInStr = "";
@@ -869,6 +872,33 @@ public class QueryHelper {
             idInStr = " and "+targetIdColName+" in (" + idInStr + ")";
         }
 
+        return Map.of("in_constraint", idInStr);
+    }
+
+    public Map<String, Object> getInConstraint3(String selectSql, String srcIdColName, String targetIdColName){
+
+        String idInStr = "";
+
+//        String inConstraint = "";
+
+        List<Map<String, Object>> ids = new ArrayList<>();
+        try {
+            ids = oqgHelper.OqgR2(selectSql, true);
+        } catch (Exception e) {
+            logger.info("Error getting ids from sql: " + selectSql);
+            return Map.of("error", "Error getting ids from sql: " + selectSql);
+        }
+
+        if(!ids.isEmpty()){
+            //build a 'in' string for sql
+            idInStr = ids.stream().map(meter -> "'" + meter.get(srcIdColName) + "'").collect(Collectors.joining(","));
+
+            String idColName = srcIdColName;
+            if(targetIdColName != null && !targetIdColName.isEmpty()){
+                idColName = targetIdColName;
+            }
+            idInStr = idColName+ " in (" + idInStr + ")";
+        }
         return Map.of("in_constraint", idInStr);
     }
 
