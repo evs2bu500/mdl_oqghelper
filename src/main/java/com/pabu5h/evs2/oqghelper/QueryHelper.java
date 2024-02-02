@@ -2331,4 +2331,58 @@ public class QueryHelper {
         }
         return Map.of("report_subs", reportSubs);
     }
+
+    public Map<String, Object> getItemSnFromItemName(String itemName, ItemTypeEnum itemTypeEnum){
+        String itemTableName = "meter";
+        String itemNameColName = "meter_displayname";
+        String itemSnColName = "meter_sn";
+        switch (itemTypeEnum) {
+            case METER:
+                itemTableName = "meter";
+                itemNameColName = "meter_displayname";
+                itemSnColName = "meter_sn";
+                break;
+            case METER_3P:
+                itemTableName = "meter_3p";
+                itemNameColName = "meter_id";
+                itemSnColName = "meter_sn";
+                break;
+            case SENSOR:
+                itemTableName = "sensor";
+                itemNameColName = "item_name";
+                itemSnColName = "item_id";
+                break;
+            case METER_IWOW:
+                itemTableName = "meter_iwow";
+                itemNameColName = "item_name";
+                itemSnColName = "item_sn";
+                break;
+            case METER_GROUP:
+                itemTableName = "meter_group";
+                itemNameColName = "name";
+                itemSnColName = "name";
+                break;
+            case TENANT:
+                itemTableName = "tenant";
+                itemNameColName = "tenant_name";
+                itemSnColName = "tenant_name";
+                break;
+            default:
+                return Collections.singletonMap("error", "itemType not supported");
+        }
+
+        String sql = "select "+itemSnColName+" from "+itemTableName+" where "+itemNameColName+" = '" + itemName + "'";
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            logger.info("Error getting item sn for itemName: " + itemName);
+            return Collections.singletonMap("error", "Error getting item sn for itemName: " + itemName);
+        }
+        if(resp.isEmpty()){
+            logger.info("item sn is empty for itemName: " + itemName);
+            return Collections.singletonMap("info", "item sn is empty for itemName: " + itemName);
+        }
+        return resp.getFirst();
+    }
 }
