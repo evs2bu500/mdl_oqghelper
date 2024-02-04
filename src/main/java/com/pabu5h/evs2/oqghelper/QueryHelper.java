@@ -2169,7 +2169,7 @@ public class QueryHelper {
         String itemIdColName = "";
         String valKey = "";
         String timeKey = "";
-        String propSelect = "";
+        String propSelect = "id,";
 
         switch (itemType) {
             case METER:
@@ -2181,7 +2181,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_displayname";
                 }
-                propSelect = "meter_sn, meter_displayname, site_tag, scope_str, mms_address, mms_unit, mms_level, mms_block, mms_building, esim_id, mms_online_timestamp";
+                propSelect += "meter_sn, meter_displayname, site_tag, scope_str, mms_address, mms_unit, mms_level, mms_block, mms_building, esim_id, mms_online_timestamp";
                 break;
             case METER_3P:
                 itemTableName = "meter_3p";
@@ -2192,7 +2192,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "meter_id";
                 }
-                propSelect = "meter_sn, meter_id, site_tag, scope_str";
+                propSelect += "meter_sn, meter_id, site_tag, scope_str";
                 break;
             case SENSOR:
                 itemTableName = "sensor";
@@ -2203,7 +2203,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "item_name";
                 }
-                propSelect = "item_id, item_name, site_tag, scope_str";
+                propSelect += "item_id, item_name, site_tag, scope_str";
                 break;
             case METER_IWOW:
                 itemTableName = "meter_iwow";
@@ -2214,7 +2214,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "item_name";
                 }
-                propSelect = "item_sn, item_name, meter_type, site_tag, scope_str, alt_name, location_tag, loc_building, loc_level";
+                propSelect += "item_sn, item_name, meter_type, site_tag, scope_str, alt_name, location_tag, loc_building, loc_level";
                 break;
             case METER_GROUP:
                 itemTableName = "meter_group";
@@ -2225,7 +2225,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "name";
                 }
-                propSelect = "name, label, meter_type, scope_str, meter_info_str, created_timestamp, updated_timestamp";
+                propSelect += "name, label, meter_type, scope_str, meter_info_str, created_timestamp, updated_timestamp";
                 break;
             case TENANT:
                 itemTableName = "tenant";
@@ -2236,7 +2236,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "tenant_name";
                 }
-                propSelect = "tenant_name, tenant_label, type, scope_str, sap_wbs, location_tag, created_timestamp";
+                propSelect += "tenant_name, tenant_label, type, scope_str, sap_wbs, location_tag, created_timestamp";
                 break;
             default:
                 return null;
