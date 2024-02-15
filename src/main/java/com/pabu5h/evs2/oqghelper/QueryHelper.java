@@ -2214,7 +2214,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "item_name";
                 }
-                propSelect += "item_sn, item_name, meter_type, site_tag, scope_str, alt_name, location_tag, loc_building, loc_level";
+                propSelect += "item_sn, item_name, meter_type, site_tag, scope_str, alt_name, location_tag, loc_building, loc_level, lc_status";
                 break;
             case METER_GROUP:
                 itemTableName = "meter_group";
