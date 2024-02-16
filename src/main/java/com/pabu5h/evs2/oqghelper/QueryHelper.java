@@ -2238,6 +2238,25 @@ public class QueryHelper {
                 }
                 propSelect += "tenant_name, tenant_label, type, scope_str, sap_wbs, location_tag, created_timestamp";
                 break;
+            case TARIFF_PACKAGE:
+                itemTableName = "tariff_package";
+                itemReadingTableName = "";
+                timeKey = "";
+                valKey = "";
+                itemIdColName = "name";
+                if(itemIdType == ItemIdTypeEnum.NAME){
+                    itemIdColName = "name";
+                }
+                propSelect += "name, label, scope_str, meter_type, package_type, updated_timestamp";
+                break;
+            case JOB_TYPE_SUB:
+                itemTableName = "job_sub";
+                itemReadingTableName = "";
+                timeKey = "updated_timestamp";
+                valKey = "";
+                itemIdColName = "id";
+                propSelect += "job_type_id, sub_fullname, sub_email, sub_salutation, user_id, is_active, rank, updated_timestamp";
+                break;
             default:
                 return null;
         }
