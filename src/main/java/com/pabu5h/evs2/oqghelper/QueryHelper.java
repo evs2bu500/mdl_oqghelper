@@ -2252,10 +2252,10 @@ public class QueryHelper {
             case JOB_TYPE_SUB:
                 itemTableName = "job_sub";
                 itemReadingTableName = "";
-                timeKey = "updated_timestamp";
+                timeKey = "";
                 valKey = "";
                 itemIdColName = "id";
-                propSelect += "job_type_id, sub_fullname, sub_email, sub_salutation, user_id, is_active, rank, updated_timestamp";
+                propSelect += "job_type_id, sub_fullname, sub_email, sub_salutation, user_id, is_active, rank";
                 break;
             default:
                 return null;
