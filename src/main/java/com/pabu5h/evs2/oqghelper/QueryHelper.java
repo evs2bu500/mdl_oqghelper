@@ -2249,6 +2249,17 @@ public class QueryHelper {
                 }
                 propSelect += "name, label, scope_str, meter_type, package_type, updated_timestamp";
                 break;
+            case JOB_TYPE:
+                itemTableName = "job_type";
+                itemReadingTableName = "";
+                timeKey = "";
+                valKey = "";
+                itemIdColName = "id";
+                if(itemIdType == ItemIdTypeEnum.NAME){
+                    itemIdColName = "name";
+                }
+                propSelect += "name, label, scope_str, site_tag, cat, updated_timestamp";
+                break;
             case JOB_TYPE_SUB:
                 itemTableName = "job_sub";
                 itemReadingTableName = "";
@@ -2403,5 +2414,23 @@ public class QueryHelper {
             return Collections.singletonMap("info", "item sn is empty for itemName: " + itemName);
         }
         return resp.getFirst();
+    }
+
+    public Map<String, Object> getJobSubs(Long jobTypeId){
+//        logger.info("getJobSub() called");
+        String sql = "select * from job_sub where job_type_id = " + jobTypeId
+                + " AND (is_active != false OR is_active IS NULL)";
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql,true);
+        } catch (Exception e) {
+            logger.severe("Failed to query job_sub table: " + e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+        if(resp.isEmpty()){
+            logger.info("Job sub not found for job type: " + jobTypeId);
+            return Map.of("info", "Job sub not found for job type: " + jobTypeId);
+        }
+        return Map.of("subs", resp);
     }
 }
