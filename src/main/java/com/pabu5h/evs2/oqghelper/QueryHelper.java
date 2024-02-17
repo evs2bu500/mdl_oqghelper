@@ -2263,7 +2263,7 @@ public class QueryHelper {
             case JOB_TYPE_SUB:
                 itemTableName = "job_sub";
                 itemReadingTableName = "";
-                timeKey = "";
+                timeKey = "updated_timestamp";
                 valKey = "";
                 itemIdColName = "id";
                 propSelect += "job_type_id, sub_fullname, sub_email, sub_salutation, user_id, is_active, rank";
@@ -2419,7 +2419,8 @@ public class QueryHelper {
     public Map<String, Object> getJobSubs(Long jobTypeId){
 //        logger.info("getJobSub() called");
         String sql = "select * from job_sub where job_type_id = " + jobTypeId
-                + " AND (is_active != false OR is_active IS NULL)";
+                + " AND (is_active != false OR is_active IS NULL)"
+                + " ORDER BY updated_timestamp DESC";
         List<Map<String, Object>> resp;
         try {
             resp = oqgHelper.OqgR2(sql,true);
