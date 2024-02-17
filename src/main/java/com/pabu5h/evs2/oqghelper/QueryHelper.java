@@ -157,7 +157,7 @@ public class QueryHelper {
         if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
-        Map<String, Object> meterInfoMap = meterInfo.get(0);
+        Map<String, Object> meterInfoMap = meterInfo.getFirst();
         MeterInfoDto meterInfoDto = MeterInfoDto.fromFieldMap(meterInfoMap);
 
         if(bypassPolicyTableName != null && !bypassPolicyTableName.isEmpty()){
@@ -171,7 +171,7 @@ public class QueryHelper {
                 return Map.of("error", "Error getting bypass policy for meter: " + meterSnStr);
             }
             if(!bypassInfo.isEmpty()){
-                Map<String, Object> meterBypassInfoMap = bypassInfo.get(0);
+                Map<String, Object> meterBypassInfoMap = bypassInfo.getFirst();
                 MeterBypassDto meterBypassDto = MeterBypassDto.fromFieldMap(meterBypassInfoMap);
                 meterInfoDto.setBypassPolicy(meterBypassDto);
             }
@@ -191,7 +191,7 @@ public class QueryHelper {
         if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
-        Map<String, Object> meterInfoMap = meterInfo.get(0);
+        Map<String, Object> meterInfoMap = meterInfo.getFirst();
         MeterInfoDto meterInfoDto = MeterInfoDto.fromFieldMap(meterInfoMap);
 
         return Map.of("meter_info", meterInfoDto);
