@@ -2416,12 +2416,12 @@ public class QueryHelper {
         return resp.getFirst();
     }
 
-    public Map<String, Object> getJobSubs(Long jobTypeId, Integer minRank){
+    public Map<String, Object> getJobSubs(Long jobTypeId, Integer maxRank){
 //        logger.info("getJobSub() called");
         String sql = "select * from job_sub where job_type_id = " + jobTypeId
                 + " AND (is_active != false OR is_active IS NULL)";
-        if(minRank != null){
-            sql += " AND rank >= " + minRank;
+        if(maxRank != null){
+            sql += " AND (rank <= " + maxRank + " OR rank IS NULL)";
         }
         sql = sql + " ORDER BY updated_timestamp DESC";
         List<Map<String, Object>> resp;
