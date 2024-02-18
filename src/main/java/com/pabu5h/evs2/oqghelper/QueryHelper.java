@@ -2416,11 +2416,14 @@ public class QueryHelper {
         return resp.getFirst();
     }
 
-    public Map<String, Object> getJobSubs(Long jobTypeId){
+    public Map<String, Object> getJobSubs(Long jobTypeId, Integer minRank){
 //        logger.info("getJobSub() called");
         String sql = "select * from job_sub where job_type_id = " + jobTypeId
-                + " AND (is_active != false OR is_active IS NULL)"
-                + " ORDER BY updated_timestamp DESC";
+                + " AND (is_active != false OR is_active IS NULL)";
+        if(minRank != null){
+            sql += " AND rank >= " + minRank;
+        }
+        sql = sql + " ORDER BY updated_timestamp DESC";
         List<Map<String, Object>> resp;
         try {
             resp = oqgHelper.OqgR2(sql,true);
