@@ -2236,7 +2236,7 @@ public class QueryHelper {
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "tenant_name";
                 }
-                propSelect += "tenant_name, tenant_label, type, scope_str, sap_wbs, location_tag, created_timestamp";
+                propSelect += "tenant_name, tenant_label, type, scope_str, sap_wbs, location_tag, created_timestamp, updated_timestamp, tariff_package_id";
                 break;
             case TARIFF_PACKAGE:
                 itemTableName = "tariff_package";
