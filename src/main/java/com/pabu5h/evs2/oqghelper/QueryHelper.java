@@ -502,7 +502,7 @@ public class QueryHelper {
     }
 
     public List<Map<String, Object>> getAllMeterInfo(){
-        String sql = "select meter_sn, meter_displayname, reading_interval, commission_timestamp" +
+        String sql = "select meter_sn, meter_displayname, reading_interval, commissioned_timestamp" +
                 " unit, street, block, building" +
                 " from meter" +
                 " inner join premise p on meter.premise_id = p.id";
@@ -515,7 +515,7 @@ public class QueryHelper {
         return meterInfo;
     }
     public List<Map<String, Object>> getAllMmsMeterInfo(){
-        String sql = "select meter_sn, meter_displayname, reading_interval, concentrator_id, commission_timestamp, " +
+        String sql = "select meter_sn, meter_displayname, reading_interval, concentrator_id, commissioned_timestamp, " +
                 " mms_address, mms_unit, mms_level, mms_block, mms_building, mms_online_timestamp, " +
                 " esim_id, data_subscription_id, scope_str, " +
                 " daily_usage_timestamp " +
