@@ -2503,6 +2503,7 @@ public class QueryHelper {
         }
     }
     public Map<String, Object> getTenantMeterGroups(Map<String, Object> request,
+                                                    String itemType,
                                                     String targetGroupTargetTableName,
                                                     String tenantTargetGroupTableName){
         String scopeStr = request.get("scope_str") == null ? "" : (String) request.get("scope_str");
@@ -2561,7 +2562,7 @@ public class QueryHelper {
                         "scope_str", scopeStr,
                         "item_id_type", itemIdTypeStr,
                         "item_index", meterGroupId,
-                        "item_type", request.get("item_type")),
+                        "item_type", itemType/*request.get("item_type")*/),
                         targetGroupTargetTableName
                     );
                     tenantMeterGroupListFullInfo.add(meterGroupInfo);
@@ -2604,7 +2605,7 @@ public class QueryHelper {
 
         return result;
     }
-    public Map<String, Object> getTariffPackage(Long tariffPackageId, int limit) {
+    public Map<String, Object> getTariffPackageRates(Long tariffPackageId, int limit) {
         String sql = "select * from tariff_package_rate where tariff_package_id=" + tariffPackageId + " order by from_timestamp desc limit " + limit;
         List<Map<String, Object>> resp;
         try {
