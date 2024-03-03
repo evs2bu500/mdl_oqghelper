@@ -2622,7 +2622,7 @@ public class QueryHelper {
             logger.info("no tariff package found for tariff package "+tariffPackageId);
             return Map.of("info", "no tariff package found for tariff package "+tariffPackageId);
         }
-        return resp.getFirst();
+        return Map.of("tariff_package_rates", resp);
     }
 
 }
