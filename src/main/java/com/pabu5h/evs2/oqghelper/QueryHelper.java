@@ -2615,9 +2615,6 @@ public class QueryHelper {
             logger.severe(e.getMessage());
             return Map.of("error", e.getMessage());
         }
-        if(resp.size() > 1){
-            return Map.of("error", "more than one tariff package found for tariff package "+tariffPackageId);
-        }
         if(resp.isEmpty()){
             logger.info("no tariff package found for tariff package "+tariffPackageId);
             return Map.of("info", "no tariff package found for tariff package "+tariffPackageId);
