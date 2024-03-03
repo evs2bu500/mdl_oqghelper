@@ -63,6 +63,7 @@ public class QueryHelper {
         return Map.of("exists", true);
     }
 
+    @Deprecated
     public List<String> getNewerMeterSns(){
         // meterSn must be at least 10 characters long
         // and must start with 2018, 2019, 2020, 2021 and above
@@ -2438,4 +2439,188 @@ public class QueryHelper {
         }
         return Map.of("subs", resp);
     }
+
+    public Map<String, Object> getGroupMeters(Map<String, Object> request, String targetGroupTargetTableName){
+        String scopeStr = request.get("scope_str") == null ? "" : (String) request.get("scope_str");
+        String itemIdTypeStr = request.get("item_id_type") == null ? "" : (String) request.get("item_id_type");
+        String meterGroupName = request.get("item_name") == null ? "" : (String) request.get("item_name");
+        String meterGroupLabel = request.get("label") == null ? "" : (String) request.get("label");
+        String meterType = request.get("meter_type") == null ? "" : (String) request.get("meter_type");
+        String meterGroupIndexStr = (String) request.get("item_index");
+        Long meterGroupIndex = MathUtil.ObjToLong(meterGroupIndexStr);
+
+        String meterTypeStr = (String) request.get("item_type");
+        ItemTypeEnum meterTypeEnum = null;
+        if(meterTypeStr != null) {
+            meterTypeEnum = ItemTypeEnum.valueOf(meterTypeStr.toUpperCase());
+        }
+        if(meterTypeEnum == null){
+            return Map.of("error", "invalid meter type");
+        }
+
+        String sql = "select meter_id, percentage from "+targetGroupTargetTableName+" where meter_group_id="+meterGroupIndex;
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, false);
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+        List<Map<String, Object>> groupMeterList = new ArrayList<>();
+        try{
+            for(Map<String, Object> respItem: resp){
+                String meterId = (String) respItem.get("meter_id");
+                Double percentage = MathUtil.ObjToDouble(respItem.get("percentage"));
+
+                //get full meter info
+                Map<String, Object> meterInfoResult = getItemInfo(meterId, ItemIdTypeEnum.ID, meterTypeEnum);
+
+                Map<String, Object> meterInfo = (Map<String, Object>) meterInfoResult.get("item_info");
+                meterInfo.put("meter_id", meterId);
+                meterInfo.put("percentage", percentage);
+
+//                groupMeterList.add(Map.of("meter_id", meterId,"percentage", percentage));
+                groupMeterList.add(meterInfo);
+            }
+            if(request.get("item_name") == null){
+                Map<String, Object> groupInfoResult = getItemInfo(meterGroupIndex.toString(), ItemIdTypeEnum.ID, ItemTypeEnum.METER_GROUP);
+                Map<String, Object> itemInfo = (Map<String, Object>) groupInfoResult.get("item_info");
+                if(itemInfo==null){
+                    return Map.of("error", "meter group not found");
+                }
+                meterGroupName = (String) itemInfo.get("name");
+                meterGroupLabel = (String) itemInfo.get("label");
+                meterType = (String) itemInfo.get("meter_type");
+            }
+            return Map.of(
+                    "group_name", meterGroupName,
+                    "group_label", meterGroupLabel,
+                    "meter_type", meterType,
+                    "group_meter_list", groupMeterList);
+        }catch (Exception e){
+            logger.severe(e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+    }
+    public Map<String, Object> getTenantMeterGroups(Map<String, Object> request,
+                                                    String targetGroupTargetTableName,
+                                                    String tenantTargetGroupTableName){
+        String scopeStr = request.get("scope_str") == null ? "" : (String) request.get("scope_str");
+        String itemIdTypeStr = request.get("item_id_type") == null ? "" : (String) request.get("item_id_type");
+        String tenantName = (String) request.get("item_name");
+        String tenantIndexStr = (String) request.get("item_index");
+        long tenantIndex = MathUtil.ObjToLong(tenantIndexStr);
+
+        boolean isGetFullInfo = request.get("get_full_info") != null && Boolean.parseBoolean((String) request.get("get_full_info"));
+
+        String sql = "select meter_group_id from "+tenantTargetGroupTableName+" where tenant_id="+tenantIndex;
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, false);
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+        List<Map<String, Object>> tenantMeterGroupList = new ArrayList<>();
+
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> tenantMeterGroupListFullInfo = new ArrayList<>();
+        if(isGetFullInfo){
+            result.put("group_full_info", tenantMeterGroupListFullInfo);
+        }
+        try{
+            for(Map<String, Object> respItem: resp){
+                String meterGroupId = (String) respItem.get("meter_group_id");
+
+                //get group info
+                String sql2 = "SELECT name, label from meter_group where id="+meterGroupId;
+                List<Map<String, Object>> resp2;
+                try {
+                    resp2 = oqgHelper.OqgR2(sql2, false);
+                } catch (Exception e) {
+                    logger.severe(e.getMessage());
+                    return Map.of("error", e.getMessage());
+                }
+                if(resp2.size() > 1){
+                    return Map.of("error", "more than one meter group found for meter group "+meterGroupId);
+                }
+                if(resp2.isEmpty()){
+                    logger.info("no meter group found for meter group "+meterGroupId);
+                    continue;
+                }
+                Map<String, Object> group = resp2.getFirst();
+                tenantMeterGroupList.add(Map.of(
+                        "meter_group_id", meterGroupId,
+                        "name", group.get("name"),
+                        "label", group.get("label")));
+//                tenantMeterGroupList.add(Map.of("meter_group_id", meterGroupId));
+
+                if(isGetFullInfo){
+                    Map<String, Object> meterGroupInfo = getGroupMeters(
+                        Map.of(
+                        "scope_str", scopeStr,
+                        "item_id_type", itemIdTypeStr,
+                        "item_index", meterGroupId,
+                        "item_type", request.get("item_type")),
+                        targetGroupTargetTableName
+                    );
+                    tenantMeterGroupListFullInfo.add(meterGroupInfo);
+                }
+            }
+            result.put("tenant_meter_group_list", tenantMeterGroupList);
+            return result;
+        }catch (Exception e){
+            logger.severe(e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+    }
+    public Map<String, Object> getTenantTariffPackages(Long tenantIndex) {
+        String sql = "select * from tenant where id=" + tenantIndex;
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, false);
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+        if(resp.size() > 1){
+            return Map.of("error", "more than one tenant found for tenant "+tenantIndex);
+        }
+        if(resp.isEmpty()){
+            logger.info("no tenant found for tenant "+tenantIndex);
+            return Map.of("info", "no tenant found for tenant "+tenantIndex);
+        }
+        Map<String, Object> tenant = resp.getFirst();
+        String tariffPackageIdE = (String) tenant.get("tariff_package_id_e");
+        String tariffPackageIdW = (String) tenant.get("tariff_package_id_w");
+        String tariffPackageIdB = (String) tenant.get("tariff_package_id_b");
+        String tariffPackageIdN = (String) tenant.get("tariff_package_id_n");
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("tariff_package_id_e", tariffPackageIdE);
+        result.put("tariff_package_id_w", tariffPackageIdW);
+        result.put("tariff_package_id_b", tariffPackageIdB);
+        result.put("tariff_package_id_n", tariffPackageIdN);
+
+        return result;
+    }
+    public Map<String, Object> getTariffPackage(Long tariffPackageId, int limit) {
+        String sql = "select * from tariff_package_rate where tariff_package_id=" + tariffPackageId + " order by from_timestamp desc limit " + limit;
+        List<Map<String, Object>> resp;
+        try {
+            resp = oqgHelper.OqgR2(sql, false);
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Map.of("error", e.getMessage());
+        }
+        if(resp.size() > 1){
+            return Map.of("error", "more than one tariff package found for tariff package "+tariffPackageId);
+        }
+        if(resp.isEmpty()){
+            logger.info("no tariff package found for tariff package "+tariffPackageId);
+            return Map.of("info", "no tariff package found for tariff package "+tariffPackageId);
+        }
+        return resp.getFirst();
+    }
+
 }
