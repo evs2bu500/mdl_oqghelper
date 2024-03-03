@@ -2502,10 +2502,11 @@ public class QueryHelper {
             return Map.of("error", e.getMessage());
         }
     }
-    public Map<String, Object> getTenantMeterGroups(Map<String, Object> request,
-                                                    String itemType,
-                                                    String targetGroupTargetTableName,
-                                                    String tenantTargetGroupTableName){
+    public Map<String, Object> getTenantMeterGroups(Map<String, Object> request){
+        String itemType = (String) request.get("meter_type");
+        String targetGroupTargetTableName = (String) request.get("target_group_target_table_name");
+        String tenantTargetGroupTableName = (String) request.get("tenant_target_group_table_name");
+
         String scopeStr = request.get("scope_str") == null ? "" : (String) request.get("scope_str");
         String itemIdTypeStr = request.get("item_id_type") == null ? "" : (String) request.get("item_id_type");
         String tenantName = (String) request.get("item_name");
