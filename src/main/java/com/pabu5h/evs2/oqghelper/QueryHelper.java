@@ -2270,6 +2270,20 @@ public class QueryHelper {
                 itemIdColName = "id";
                 propSelect += "job_type_id, sub_fullname, sub_email, sub_salutation, user_id, is_active, rank";
                 break;
+            case BILLING_REC:
+                itemTableName = "billing_rec_cw";
+                itemReadingTableName = "";
+                timeKey = "";
+                valKey = "";
+                itemIdColName = "id";
+                if(itemIdType == ItemIdTypeEnum.NAME){
+                    itemIdColName = "name";
+                }
+                propSelect += "name, scope_str, site_tag, tenant_id, tariff_package_id, recon_user_id, "
+                + "from_timestamp, to_timestamp, "
+                + "tariff_package_id_e, tariff_package_id_w, tariff_package_id_b, tariff_package_id_n, "
+                + "lc_status, created_timestamp, updated_timestamp";
+                break;
             default:
                 return null;
         }
