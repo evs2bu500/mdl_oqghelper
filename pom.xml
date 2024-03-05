@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.pabu5h.evs2</groupId>
 	<artifactId>oqghelper</artifactId>
-	<version>3.25.6</version>
+	<version>3.25.7</version>
 	<name>OqgHelper</name>
 	<description>OqgHelper</description>
 
