@@ -2674,7 +2674,7 @@ public class QueryHelper {
 
             if(fromTimestamp.isBefore(midTime) && toTimestamp.isAfter(midTime)){
 //                tariffRate.put("tariff_package_rate_id_col_name", "tariff_package_rate_id_"+meterTypeTag.toLowerCase());
-                return tariffRate;
+                return Collections.singletonMap("result", tariffRate);
             }
         }
         logger.severe("No valid tariff found for meterTypeTag: " + meterTypeTag);
