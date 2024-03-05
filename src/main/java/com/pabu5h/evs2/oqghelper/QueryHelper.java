@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -2634,6 +2635,50 @@ public class QueryHelper {
             return Map.of("info", "no tariff package found for tariff package "+tariffPackageId);
         }
         return Map.of("tariff_package_rates", resp);
+    }
+
+    public Map<String, Object> findTariff(String meterTypeTag, Map<String, Object> tenantTariffIds, String firstReadingTimeStr, String lastReadingTimeStr) {
+        logger.info("Finding tariff");
+
+        //find the id that ends with the meterTypeTag
+        String tariffId = null;
+        for (Map.Entry<String, Object> entry : tenantTariffIds.entrySet()) {
+            if (entry.getKey().endsWith("_"+meterTypeTag.toLowerCase())) {
+                tariffId = entry.getKey();
+                break;
+            }
+        }
+        if(tariffId == null){
+            logger.severe("Tariff not found for meterTypeTag: " + meterTypeTag);
+            return Collections.singletonMap("error", "Tariff not found for meterTypeTag: " + meterTypeTag);
+        }
+
+        Long tariffPackageIndex = MathUtil.ObjToLong(tenantTariffIds.get(tariffId));
+        Map<String, Object> tariffRateResult = getTariffPackageRates(tariffPackageIndex, 12);
+        List<Map<String, Object>> tariffRates = (List<Map<String, Object>>) tariffRateResult.get("tariff_package_rates");
+        if(tariffRates == null || tariffRates.isEmpty()){
+            logger.severe("No tariff rates found for tariffPackageIndex: " + tariffPackageIndex);
+            return Collections.singletonMap("error", "No tariff rates found for tariffPackageIndex: " + tariffPackageIndex);
+        }
+
+        for(Map<String, Object> tariffRate : tariffRates){
+            //find the tariff that is valid for the firstReadingTime
+            String fromTimestampStr = (String) tariffRate.get("from_timestamp");
+            LocalDateTime fromTimestamp = DateTimeUtil.getLocalDateTime(fromTimestampStr);
+            String toTimestampStr = (String) tariffRate.get("to_timestamp");
+            LocalDateTime toTimestamp = DateTimeUtil.getLocalDateTime(toTimestampStr);
+
+            LocalDateTime firstReadingTime = DateTimeUtil.getLocalDateTime(firstReadingTimeStr);
+            LocalDateTime lastReadingTime = DateTimeUtil.getLocalDateTime(lastReadingTimeStr);
+            LocalDateTime midTime = firstReadingTime.plusSeconds(Duration.between(firstReadingTime, lastReadingTime).getSeconds()/2);
+
+            if(fromTimestamp.isBefore(midTime) && toTimestamp.isAfter(midTime)){
+//                tariffRate.put("tariff_package_rate_id_col_name", "tariff_package_rate_id_"+meterTypeTag.toLowerCase());
+                return tariffRate;
+            }
+        }
+        logger.severe("No valid tariff found for meterTypeTag: " + meterTypeTag);
+        return Collections.singletonMap("error", "No valid tariff found for meterTypeTag: " + meterTypeTag);
     }
 
 }
