@@ -2280,7 +2280,7 @@ public class QueryHelper {
                     itemIdColName = "name";
                 }
                 propSelect += "name, scope_str, site_tag, tenant_id, tariff_package_id, recon_user_id, "
-                + "from_timestamp, to_timestamp, "
+                + "from_timestamp, to_timestamp, is_monthly, "
                 + "tariff_package_rate_id_e, tariff_package_rate_id_w, tariff_package_rate_id_b, tariff_package_rate_id_n, "
                 + "lc_status, created_timestamp, updated_timestamp";
                 break;
