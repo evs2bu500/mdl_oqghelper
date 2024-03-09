@@ -2198,9 +2198,9 @@ public class QueryHelper {
                 break;
             case SENSOR:
                 itemTableName = "sensor";
-                itemReadingTableName = "sensor_reading";
+                itemReadingTableName = "sensor_reading_multi";
                 timeKey = "dt";
-                valKey = "val";
+                valKey = "temperature, humidity";
                 itemIdColName = "item_id";
                 if(itemIdType == ItemIdTypeEnum.NAME){
                     itemIdColName = "item_name";
