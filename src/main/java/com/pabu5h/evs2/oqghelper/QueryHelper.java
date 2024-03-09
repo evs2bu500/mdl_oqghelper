@@ -2162,7 +2162,7 @@ public class QueryHelper {
             logger.info("last reading is empty for itemId: " + itemId);
             return Collections.singletonMap("info", "last reading is empty for itemId: " + itemId);
         }
-        return Collections.singletonMap("last_reading", lastReading.get(0));
+        return Collections.singletonMap("last_reading", lastReading.getFirst());
     }
 
     private Map<String, String> getItemTableInfo(ItemTypeEnum itemType, ItemIdTypeEnum itemIdType){
