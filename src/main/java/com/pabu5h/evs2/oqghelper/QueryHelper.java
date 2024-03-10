@@ -556,7 +556,7 @@ public class QueryHelper {
         if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
-        return meterInfo.get(0);
+        return meterInfo.getFirst();
     }
 
     public long getActiveMeterCount(String tableName){
@@ -584,7 +584,7 @@ public class QueryHelper {
         if(count.isEmpty()){
             return 0;
         }
-        return Long.parseLong(count.get(0).get("count").toString());
+        return Long.parseLong(count.getFirst().get("count").toString());
     }
 
     public Map<String, Object> getActiveMeterCountHistory(String tableName, int days){
@@ -672,7 +672,7 @@ public class QueryHelper {
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
-        if(kwhConsumption.get(0).get("total_kwh") == null){
+        if(kwhConsumption.getFirst().get("total_kwh") == null){
             return 0;
         }
         return Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
@@ -944,10 +944,10 @@ public class QueryHelper {
             return Collections.singletonMap("info", "no data");
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
-        if(kwhConsumption.get(0).get("kwh_total") == null){
+        if(kwhConsumption.getFirst().get("kwh_total") == null){
             return Collections.singletonMap("info", "no data");
         }
-        double kwhTotal = Double.parseDouble(kwhConsumption.get(0).get("kwh_total").toString());
+        double kwhTotal = Double.parseDouble(kwhConsumption.getFirst().get("kwh_total").toString());
         return Collections.singletonMap("active_kwh_consumption", kwhTotal);
     }
 
@@ -969,10 +969,10 @@ public class QueryHelper {
             return 0;
         }
         //sum() will always return a value, even if there is no data, the list will still have 1 element
-        if(dataConsumption.get(0).get("data_total") == null){
+        if(dataConsumption.getFirst().get("data_total") == null){
             return 0;
         }
-        return Double.parseDouble(dataConsumption.get(0).get("data_total").toString());
+        return Double.parseDouble(dataConsumption.getFirst().get("data_total").toString());
     }
 
     public Map<String, Object> getAllActiveKwhConsumptionHistory(int days, LocalDateTime localNow, Map<String, String> scope){
@@ -1219,7 +1219,7 @@ public class QueryHelper {
             logger.info("meter_displayname is empty for meter_sn: " + meterSn);
             return "";
         }
-        return (meterSnList.get(0).get("meter_displayname") == null ? "" : meterSnList.get(0).get("meter_displayname").toString());
+        return (meterSnList.getFirst().get("meter_displayname") == null ? "" : meterSnList.getFirst().get("meter_displayname").toString());
     }
 
 
@@ -1240,7 +1240,7 @@ public class QueryHelper {
             logger.info("ref_bal is empty for meterSn: " + meterSnStr);
             return Collections.singletonMap("info", "ref_bal is empty for meterSn: " + meterSnStr);
         }
-        return meterCredit.get(0);
+        return meterCredit.getFirst();
     }
 
     public List<Long> getConcentratorIDs(){
@@ -1272,7 +1272,7 @@ public class QueryHelper {
             logger.info("concentrator is empty for meterSn: " + meterSnStr);
             return -1;
         }
-        return MathUtil.ObjToLong(concentrator.get(0).get("concentrator_id")==null?-1:concentrator.get(0).get("concentrator_id"));
+        return MathUtil.ObjToLong(concentrator.getFirst().get("concentrator_id")==null?-1:concentrator.getFirst().get("concentrator_id"));
     }
     public Map<Long, Map<String, Object>> getConcentratorTariff(){
         //get a list of concentrator_id from concentrator table
@@ -1304,8 +1304,8 @@ public class QueryHelper {
                 continue;
             }
             concentratorTariff.put(concentratorId,
-                    Map.of("tariff_price", MathUtil.ObjToDouble(tariff.get(0).get("tariff_price")),
-                            "offer_id", MathUtil.ObjToLong(tariff.get(0).get("offer_id"))));
+                    Map.of("tariff_price", MathUtil.ObjToDouble(tariff.getFirst().get("tariff_price")),
+                            "offer_id", MathUtil.ObjToLong(tariff.getFirst().get("offer_id"))));
         }
         return concentratorTariff;
     }
@@ -1324,7 +1324,7 @@ public class QueryHelper {
             logger.info("tariff is empty for meterSn: " + meterSnStr);
             return Collections.singletonMap("info", "tariff is empty for meterSn: " + meterSnStr);
         }
-        return meterTariff.get(0);
+        return meterTariff.getFirst();
     }
     public boolean meterSnExistsInMeterTable(String meterSnStr){
         String sql = "select id from meter where meter_sn = '" + meterSnStr + "'";
@@ -1355,7 +1355,7 @@ public class QueryHelper {
             logger.info("epoch_ref_bal is empty for meterSn: " + meterSnStr);
             return Collections.singletonMap("info", "epoch_ref_bal is empty for meterSn: " + meterSnStr);
         }
-        return meterCredit.get(0);
+        return meterCredit.getFirst();
     }
     public Map<String, Object> getRecentMeterKiv(){
         List<Map<String, Object>>meterKiv = new ArrayList<>();
@@ -1433,7 +1433,7 @@ public class QueryHelper {
             }
         } else {
             //update the record
-            long id = MathUtil.ObjToLong(meterKiv.get(0).get("id"));
+            long id = MathUtil.ObjToLong(meterKiv.getFirst().get("id"));
             long numOfEventsOld = MathUtil.ObjToLong(meterKiv.get(0).get("number_of_events")==null?0:meterKiv.get(0).get("number_of_events"));
             long numOfEventsNew = numOfEventsOld + numOfEvents;
             String sqlUpdate = "update " + meterKivTable + " set number_of_events = " + numOfEventsNew +
@@ -1587,8 +1587,8 @@ public class QueryHelper {
             }
         } else {
             //update the record
-            long id = MathUtil.ObjToLong(meterKiv.get(0).get("id"));
-            long numOfEventsOld = MathUtil.ObjToLong(meterKiv.get(0).get("number_of_events")==null?0:meterKiv.get(0).get("number_of_events"));
+            long id = MathUtil.ObjToLong(meterKiv.getFirst().get("id"));
+            long numOfEventsOld = MathUtil.ObjToLong(meterKiv.getFirst().get("number_of_events")==null?0:meterKiv.get(0).get("number_of_events"));
             long numOfEventsNew = numOfEventsOld + numOfEvents;
             String sqlUpdate = "update " + meterKivTable + " set number_of_events = " + numOfEventsNew +
                     " where id = " + id;
@@ -1748,7 +1748,7 @@ public class QueryHelper {
                     " postal_code = '" + postalCode + "'," +
                     " building_identifier = '" + buildingId + "'," +
                     " scope_str = '" + scopeStr + "'" +
-                    " where id = " + premises.get(0).get("id");
+                    " where id = " + premises.getFirst().get("id");
             try {
                 oqgHelper.OqgIU(upd);
             } catch (Exception e) {
@@ -1820,7 +1820,7 @@ public class QueryHelper {
             return Collections.singletonMap("info", "bypass policy is empty for meterSn: " + meterSnStr);
         }
         //        return bypassPolicy.get(0);
-        Map<String, Object> effectiveBypassPolicy = bypassPolicy.get(0);
+        Map<String, Object> effectiveBypassPolicy = bypassPolicy.getFirst();
         boolean bypassAlways = effectiveBypassPolicy.get("bypass_always") != null && (boolean) effectiveBypassPolicy.get("bypass_always");
         if(bypassAlways){
             return Map.of("bypass_always", true);
@@ -1959,7 +1959,7 @@ public class QueryHelper {
                 logger.info("bypass is empty for meterSn: " + meterSnStr + "in meter_tariff");
                 continue;
             }
-            String count2 = (String)resp2.get(0).get("bypass_count");
+            String count2 = (String)resp2.getFirst().get("bypass_count");
             bypasses.add(Map.of("from_timestamp", fromTimestamp,
                                 "to_timestamp", toTimestamp,
                                 "bypass_count", count2));
@@ -2095,7 +2095,7 @@ public class QueryHelper {
             return Collections.singletonMap("info", "history ops is empty for tableName: " + tableName);
         }
         //get username from user table
-        String userIdStr = (String) historyOps.get(0).get("user_id");
+        String userIdStr = (String) historyOps.getFirst().get("user_id");
         String sql2 = "select username from "+userTableName+" where id = " + userIdStr;
         List<Map<String, Object>> users = new ArrayList<>();
         try {
@@ -2108,9 +2108,9 @@ public class QueryHelper {
             logger.info("user is empty for userId: " + userIdStr);
             return Collections.singletonMap("info", "user is empty for userId: " + userIdStr);
         }
-        String username = (String) users.get(0).get("username");
-        historyOps.get(0).put("username", username);
-        return historyOps.get(0);
+        String username = (String) users.getFirst().get("username");
+        historyOps.getFirst().put("username", username);
+        return historyOps.getFirst();
     }
 
     public Map<String, Object> getItemInfo(String itemId, ItemIdTypeEnum itemIdType, ItemTypeEnum itemType){
