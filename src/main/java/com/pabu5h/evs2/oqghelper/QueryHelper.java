@@ -2252,6 +2252,14 @@ public class QueryHelper {
                 }
                 propSelect += "name, label, scope_str, meter_type, package_type, updated_timestamp";
                 break;
+            case TARIFF_PACKAGE_RATE:
+                itemTableName = "tariff_package_rate";
+                itemReadingTableName = "";
+                timeKey = "created_timestamp";
+                valKey = "";
+                itemIdColName = "id";
+                propSelect += "tariff_package_id, from_timestamp, to_timestamp, rate, gst, created_timestamp, updated_timestamp";
+                break;
             case JOB_TYPE:
                 itemTableName = "job_type";
                 itemReadingTableName = "";
