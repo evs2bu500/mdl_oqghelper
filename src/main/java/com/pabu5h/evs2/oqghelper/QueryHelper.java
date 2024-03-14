@@ -2291,6 +2291,8 @@ public class QueryHelper {
                 propSelect += "name, scope_str, site_tag, tenant_id, tariff_package_id, recon_user_id, "
                 + "from_timestamp, to_timestamp, is_monthly, "
                 + "tariff_package_rate_id_e, tariff_package_rate_id_w, tariff_package_rate_id_b, tariff_package_rate_id_n, "
+                + "manual_usage_e, manual_usage_w, manual_usage_b, manual_usage_n, "
+                + "line_item_label_1, line_item_amount_1, "
                 + "lc_status, created_timestamp, updated_timestamp";
                 break;
             default:
