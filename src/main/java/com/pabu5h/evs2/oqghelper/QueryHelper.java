@@ -1189,16 +1189,26 @@ public class QueryHelper {
         }
         return meterSnList;
     }
+    public String getTimeKey(String tableName){
+        return switch (tableName) {
+            case "meter_reading" -> "kwh_timestamp";
+            case "meter_tariff" -> "tariff_timestamp";
+            default -> "kwh_timestamp";
+        };
+    }
     public List<String> getActiveMeterSns2(String tableName, String sinceDateTimeStr){
+        String timeKey = getTimeKey(tableName);
+
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
+            timeKey = "tariff_timestamp";
         }
 
         List<Map<String, Object>> meterSns;
         String sql = "select distinct meter_sn from " + tableName;
 
         if(sinceDateTimeStr != null && !sinceDateTimeStr.isEmpty()){
-            sql = sql + " where kwh_timestamp > timestamp '" + sinceDateTimeStr + "'";
+            sql = sql + " where "+timeKey+" > timestamp '" + sinceDateTimeStr + "'";
         }
 
         try {
