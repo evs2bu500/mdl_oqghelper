@@ -34,6 +34,8 @@ public class OqgHelper {
 
     @Value("${oqg.ept.r2}")
     private String oqgEptR2;
+    @Value("${oqg.ept.i2}")
+    private String oqgEptI2;
 
 //    OqgHelper(RestTemplate template){
 //        restTemplate = template;
@@ -148,6 +150,41 @@ public class OqgHelper {
 
         } catch (Exception e){
             String msg = "OQG IU Error: " + e.getMessage();
+            logger.info(msg);
+            throw new Exception(msg);
+        }
+    }
+
+    public Map<String, Object> OqgI2(String sqlQuery, boolean getReturnId) throws Exception {
+        String iuUrl = oqgPath + oqgEptI2;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> payloadForJson = new HashMap<>();
+        payloadForJson.put("sql", sqlQuery);
+        payloadForJson.put("get_return_id", getReturnId);
+
+        // Create the request entity
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payloadForJson, headers);
+
+        try {
+            // Make the request using RestTemplate
+            ResponseEntity<String> response = restTemplate.postForEntity(iuUrl, requestEntity, String.class);
+
+            String responseBody = response.getBody();
+            if(responseBody == null){
+                String msg = "OQG I2 Error: Response body is null";
+                logger.info(msg);
+                throw new Exception(msg);
+            }
+
+            if(getReturnId){
+                long id = Long.parseLong(responseBody);
+                return Map.of("resp", Long.toString(id));
+            }else {
+                return Map.of("resp", responseBody);
+            }
+        } catch (Exception e){
+            String msg = "OQG I2 Error: " + e.getMessage();
             logger.info(msg);
             throw new Exception(msg);
         }
