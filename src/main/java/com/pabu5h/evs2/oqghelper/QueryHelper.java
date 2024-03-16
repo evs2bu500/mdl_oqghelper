@@ -1228,9 +1228,8 @@ public class QueryHelper {
             logger.info("meter_sn is empty for meterDisplayname: " + meterDisplayname);
             return "";
         }
-        return (meterSn.get(0).get("meter_sn") == null ? "" : meterSn.get(0).get("meter_sn").toString());
+        return (meterSn.getFirst().get("meter_sn") == null ? "" : meterSn.getFirst().get("meter_sn").toString());
     }
-
     public String getMeterDisplaynameFromSn(String meterSn) {
         String sql = "select meter_displayname from meter where meter_sn = '" + meterSn + "'";
         List<Map<String, Object>> meterSnList = new ArrayList<>();
@@ -1246,8 +1245,6 @@ public class QueryHelper {
         }
         return (meterSnList.getFirst().get("meter_displayname") == null ? "" : meterSnList.getFirst().get("meter_displayname").toString());
     }
-
-
     public Map<String, Object> getLatestMeterCredit(String meterSnStr, String tableName){
         if(tableName == null || tableName.isBlank()){
             tableName = "meter_tariff";
