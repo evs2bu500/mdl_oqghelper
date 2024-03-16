@@ -1165,7 +1165,6 @@ public class QueryHelper {
 
         return Collections.singletonMap("recent_kwh_consumptions", totalConsumptions);
     }
-
     public List<String> getAllMeterSns(String tableName){
         if(tableName ==null || tableName.isEmpty()){
             tableName = "meter_tariff";
@@ -1176,6 +1175,28 @@ public class QueryHelper {
         String sgNow = DateTimeUtil.getZonedDateTimeStr(now(), ZoneId.of("Asia/Singapore"));
         String sql = "select distinct meter_sn from " + tableName;
 
+        try {
+            meterSns = oqgHelper.OqgR2(sql, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+//        return meterSns.stream().map(meterSn -> meterSn.get("meter_sn").toString()).toList();
+        List<String> meterSnList = new ArrayList<>();
+        for(Map<String, Object> meterSn : meterSns){
+            if(meterSn.get("meter_sn") != null){
+                meterSnList.add(meterSn.get("meter_sn").toString());
+            }
+        }
+        return meterSnList;
+    }
+    public List<String> getActiveMeterSns2(String tableName, String sinceDateTimeStr){
+        if(tableName ==null || tableName.isEmpty()){
+            tableName = "meter_tariff";
+        }
+
+        List<Map<String, Object>> meterSns;
+        String sql = "select distinct meter_sn from " + tableName +
+                " where kwh_timestamp > timestamp '" + sinceDateTimeStr + "'";
         try {
             meterSns = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
