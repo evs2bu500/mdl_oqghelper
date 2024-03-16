@@ -1195,8 +1195,12 @@ public class QueryHelper {
         }
 
         List<Map<String, Object>> meterSns;
-        String sql = "select distinct meter_sn from " + tableName +
-                " where kwh_timestamp > timestamp '" + sinceDateTimeStr + "'";
+        String sql = "select distinct meter_sn from " + tableName;
+
+        if(sinceDateTimeStr != null && !sinceDateTimeStr.isEmpty()){
+            sql = sql + " where kwh_timestamp > timestamp '" + sinceDateTimeStr + "'";
+        }
+
         try {
             meterSns = oqgHelper.OqgR2(sql, true);
         } catch (Exception e) {
