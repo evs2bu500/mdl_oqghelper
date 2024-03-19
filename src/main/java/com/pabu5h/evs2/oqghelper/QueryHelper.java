@@ -346,7 +346,8 @@ public class QueryHelper {
     }
     public Map<String, Object> getScopeLevels(String building, String block,
                                               String projectScope, String siteScope){
-        String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'"
+        String buildingNameSqlSafe = building.replace("'", "''");
+        String sql = "select DISTINCT mms_level from meter where mms_building = '" + buildingNameSqlSafe + "' and mms_block = '" + block + "'"
                 + " ORDER BY mms_level ASC";
 
         String meterTableName = "meter";
@@ -354,7 +355,7 @@ public class QueryHelper {
         String colNameBlock = "mms_block";
         String colNameLevel = "mms_level";
         Map<String, Object> targets = new HashMap<>();
-        targets.put("mms_building", building);
+        targets.put("mms_building", buildingNameSqlSafe);
         targets.put("mms_block", block);
 
         if(projectScope != null && !projectScope.isEmpty()){
@@ -364,7 +365,7 @@ public class QueryHelper {
 //                colNameBlock = "loc_block";
                 colNameLevel = "loc_level";
                 targets.clear();
-                targets.put("loc_building", building);
+                targets.put("loc_building", buildingNameSqlSafe);
             }
         }
 
@@ -416,7 +417,7 @@ public class QueryHelper {
                 Map.of("from", "meter",
                         "select",
                         "DISTINCT mms_block",
-                        "targets", Map.of("mms_building", building),
+                        "targets", Map.of("mms_building", buildingNameSqlSafe),
                         "like_targets", likeTargets
                 ));
         sql = sqlResult.get("sql");
@@ -449,7 +450,7 @@ public class QueryHelper {
                 Map.of("from", "meter",
                         "select",
                         "DISTINCT mms_level",
-                        "targets", Map.of("mms_building", building, "mms_block", block),
+                        "targets", Map.of("mms_building", buildingNameSqlSafe, "mms_block", block),
                         "like_targets", likeTargets
                 ));
         sql = sqlResult.get("sql");
@@ -488,7 +489,7 @@ public class QueryHelper {
                 Map.of("from", "meter",
                         "select",
                         "DISTINCT mms_unit",
-                        "targets", Map.of("mms_building", building, "mms_block", block, "mms_level", level),
+                        "targets", Map.of("mms_building", buildingNameSqlSafe, "mms_block", block, "mms_level", level),
                         "like_targets", likeTargets
                 ));
         sql = sqlResult.get("sql");
