@@ -143,7 +143,7 @@ public class QueryHelper {
         if(meterInfo.isEmpty()){
             return Map.of("info", "meter not found");
         }
-        Map<String, Object> meterInfoMap = meterInfo.get(0);
+        Map<String, Object> meterInfoMap = meterInfo.getFirst();
         MeterInfoDto meterInfoDto = MeterInfoDto.fromFieldMap(meterInfoMap);
 
         return Map.of("meter_info", meterInfoDto);
@@ -400,8 +400,9 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getMmsBuildingBlocks (String building, String projectScope, String siteScope){
+        String buildingNameSqlSafe = building.replace("'", "''");
         String sql = "select DISTINCT mms_block from meter where " +
-                " mms_building = '" + building + "'" +
+                " mms_building = '" + buildingNameSqlSafe + "'" +
                 " ORDER BY mms_block ASC";
 
         Map<String, Object> likeTargets = new HashMap<>();
@@ -434,7 +435,8 @@ public class QueryHelper {
     }
 
     public Map<String, Object> getMmsLevels (String building, String block, String projectScope, String siteScope){
-        String sql = "select DISTINCT mms_level from meter where mms_building = '" + building + "' and mms_block = '" + block + "'"
+        String buildingNameSqlSafe = building.replace("'", "''");
+        String sql = "select DISTINCT mms_level from meter where mms_building = '" + buildingNameSqlSafe + "' and mms_block = '" + block + "'"
                 + " ORDER BY mms_level ASC";
         Map<String, Object> likeTargets = new HashMap<>();
         if(projectScope != null && !projectScope.isEmpty()){
@@ -465,7 +467,8 @@ public class QueryHelper {
         return Map.of("level_list", meterInfo.stream().map(meter -> meter.get("mms_level")).toList());
     }
     public Map<String, Object> getMmsUnits (String building, String block, String level, String projectScope, String siteScope){
-        String sql = "select DISTINCT mms_unit from meter where mms_building = '" + building + "' and mms_block = '" + block + "'" +
+        String buildingNameSqlSafe = building.replace("'", "''");
+        String sql = "select DISTINCT mms_unit from meter where mms_building = '" + buildingNameSqlSafe + "' and mms_block = '" + block + "'" +
                 " and mms_level = '" + level + "'"
                 + " ORDER BY mms_unit ASC";
 //        if(projectScope != null && !projectScope.isEmpty()){
