@@ -2727,4 +2727,39 @@ public class QueryHelper {
         return Collections.singletonMap("error", "No valid tariff found for meterTypeTag: " + meterTypeTag);
     }
 
+    public Map<String, Object> logFeedback(Map<String, Object> feedbackInfo){
+        String feedbackTableName = "feedback";
+        String submit_timestamp = (String) feedbackInfo.get("submit_timestamp");
+        String type = (String) feedbackInfo.get("type");
+        String scopeStr = (String) feedbackInfo.get("scope_str");
+        String serviceName = (String) feedbackInfo.get("service_name");
+        String itemName = (String) feedbackInfo.get("item_name");
+        String address = (String) feedbackInfo.get("address");
+        String email = (String) feedbackInfo.get("email");
+        String message = (String) feedbackInfo.get("message");
+
+        Map<String, Object> feedbackSqlMap = Map.of("table", feedbackTableName,
+                "content", Map.of(
+                        "submit_timestamp", submit_timestamp,
+                        "type", type,
+                        "scope_str", scopeStr,
+                        "service_name", serviceName,
+                        "item_name", itemName,
+                        "address", address,
+                        "email", email,
+                        "message", message
+                ));
+        Map<String, String> sqlInsert = SqlUtil.makeInsertSql(feedbackSqlMap);
+        if(sqlInsert.get("sql")==null){
+            logger.info("Error getting insert sql for feedback");
+            return Collections.singletonMap("error", "Error getting insert sql for feedback");
+        }
+        try {
+            oqgHelper.OqgIU(sqlInsert.get("sql"));
+        } catch (Exception e) {
+            logger.info("Error inserting feedback");
+            return Collections.singletonMap("error", "Error inserting feedback");
+        }
+        return Collections.singletonMap("success", "feedback is inserted");
+    }
 }
