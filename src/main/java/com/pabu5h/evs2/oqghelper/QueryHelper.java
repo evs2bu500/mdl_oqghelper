@@ -2736,6 +2736,7 @@ public class QueryHelper {
         String itemName = (String) feedbackInfo.get("item_name");
         String address = (String) feedbackInfo.get("address");
         String email = (String) feedbackInfo.get("email");
+        String feedbackEmail = (String) feedbackInfo.get("feedback_email");
         String message = (String) feedbackInfo.get("message");
 
         Map<String, Object> feedbackSqlMap = Map.of("table", feedbackTableName,
@@ -2747,6 +2748,7 @@ public class QueryHelper {
                         "item_name", itemName,
                         "address", address,
                         "email", email,
+                        "feedback_email", feedbackEmail,
                         "message", message
                 ));
         Map<String, String> sqlInsert = SqlUtil.makeInsertSql(feedbackSqlMap);
