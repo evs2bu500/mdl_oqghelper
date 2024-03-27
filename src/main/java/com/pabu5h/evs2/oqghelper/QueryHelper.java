@@ -1263,7 +1263,7 @@ public class QueryHelper {
         if(tableName == null || tableName.isBlank()){
             tableName = "meter_tariff";
         }
-        String sql = "select ref_bal from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
+        String sql = "select ref_bal, tariff_timestamp from " + tableName + " where meter_sn = '" + meterSnStr + "'" +
                 " and ref_bal is not null order by tariff_timestamp desc limit 1";
         List<Map<String, Object>> meterCredit = new ArrayList<>();
         try {
